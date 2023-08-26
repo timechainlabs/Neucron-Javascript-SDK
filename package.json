@@ -1,0 +1,35 @@
+{
+  "name": "@neucron/sdk",
+  "version": "0.0.1",
+  "description": "The official Relysia javascript SDK",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha test/*.test.js && exit 0",
+    "build": "npm run make:dir && npm run browserify",
+    "browserify": "browserify index.js --standalone RelysiaSDK > dist/relysia-sdk.js",
+    "lint": "npx eslint .",
+    "lint:fix": "npx eslint . --fix",
+    "make:dir": "mkdir -p dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Rookie768/timechainlabs-neucron-sdk.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Rookie768/timechainlabs-neucron-sdk/issues"
+  },
+  "homepage": "https://github.com/Rookie768/timechainlabs-neucron-sdk#readme",
+  "dependencies": {
+    "axios": "^0.22.0",
+    "browserify": "^17.0.0",
+    "joi": "^17.4.2"
+  },
+  "devDependencies": {
+    "chai": "^4.3.4",
+    "eslint": "^7.32.0",
+    "eslint-config-google": "^0.14.0",
+    "mocha": "^9.1.2"
+  }
+}
