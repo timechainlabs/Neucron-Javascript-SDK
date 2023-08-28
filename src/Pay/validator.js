@@ -6,21 +6,20 @@ class Validator {
 
   async txMultipayc(opts) {
     const schema = Joi.object({
-      walletID: Joi.string(),
-      input: Joi.array().items(
+      Input: Joi.array().items(
           Joi.object({
-            sequenceNum: Joi.number().integer().required(),
-            utxoId: Joi.number().integer().required(),
+            SequenceNum: Joi.number().integer().required(),
+            Utxo_index: Joi.number().integer().required(),
           }),
       ),
-      lockTime: Joi.string().isoDate(),
-      outputs: Joi.array().items(
+      LockTime: Joi.string().isoDate(),
+      Outputs: Joi.array().items(
           Joi.object({
-            amount: Joi.number().integer().required(),
-            asm: Joi.string().required(),
+            Amount: Joi.number().integer().required(),
+            Asm: Joi.string().required(),
           }),
       ),
-      changeAddress: Joi.string(),
+      Change_Address: Joi.string(),
     });
 
     await schema.validateAsync(opts);
