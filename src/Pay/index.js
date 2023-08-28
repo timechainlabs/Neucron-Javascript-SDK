@@ -72,6 +72,21 @@ class Transaction {
     return response.headers;
   }
 
+  /**
+   * Initiates a payment channel transaction.
+   *
+   * @param {Object} options - The options for the payment channel transaction.
+   * @param {string} options.walletID - The ID of the wallet initiating the transaction (query parameter).
+   * @param {Object} options.sendData - The data for the transaction.
+   * @param {string} options.sendData.address - The recipient's address.
+   * @param {number} options.sendData.amount - The amount of the transaction.
+   * @param {string} options.sendData.date - The date of the transaction (format: yyyy-mm-dd).
+   * @param {number} options.sendData.sequence_Num - The sequence number of the transaction.
+   * @param {string} options.sendData.time - The time of the transaction (format: hh:mm:ss).
+   * @param {string} options.accessToken - The access token for authentication (Authorization header).
+   * @return {Object} - The response data from the transaction.
+   * @throws {Error} - If the transaction fails or encounters an error.
+   */
   async payChannelTxn(options) {
     try {
       await this.validate();
@@ -96,7 +111,7 @@ class Transaction {
         },
       };
 
-      const response = await this.request.postRequest(endpoint, headers, requestBody);
+      const response = await this.request.postRequest(baseUrl + endpoint, headers, requestBody);
 
       if (response instanceof Error) {
         throw response;

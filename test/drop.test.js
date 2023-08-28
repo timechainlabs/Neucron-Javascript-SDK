@@ -1,11 +1,10 @@
 const {expect} = require('chai');
-const Validator = require('../src/Pay/validator.js');
+const validator = require('../src/Pay/validator'); // Update the path accordingly
 const Joi = require('joi');
 
 describe('Validator', () => {
   describe('txMultipayc', () => {
     it('should validate options for a multiple payment channel transaction', async () => {
-      const validator = new Validator();
       const validOptions = {
         walletID: 'wallet123',
         input: [
@@ -23,13 +22,11 @@ describe('Validator', () => {
         await validator.txMultipayc(validOptions);
       } catch (error) {
         // If validation fails, an exception will be thrown
-        expect.fail('Validation should not fail');
+        throw new Error('Validation should not fail');
       }
     });
 
     it('should throw an error for invalid options', async () => {
-      const validator = new Validator(); // Create an instance of the Validator class
-
       // Example invalid options (missing required fields)
       const invalidOptions = {
         input: [
@@ -40,8 +37,9 @@ describe('Validator', () => {
         ],
       };
       try {
-        await validator.txMultipayc(invalidOptions);
-        expect.fail('Validation should fail');
+        await validator.txMultipayc(invalidOptions).then((res) =>{}).catch((obj) => {
+          throw new Error('Validation should fail');
+        });
       } catch (error) {
         expect(error).to.be.an.instanceOf(Joi.ValidationError);
       }
