@@ -130,5 +130,52 @@ class Transaction {
       throw new Error('Transaction request failed: ' + error.message);
     }
   }
-}
 
+  // eslint-disable-next-line valid-jsdoc
+  /**
+   * Initiates a transaction for sending cryptocurrency to multiple output addresses.
+   *
+   * @param {{change_Address: string, output_Utxo: [{amount: number, address: string}]}} options - Options for configuring the transaction.
+   * @param {Object[]} options.output_Utxo - An array of output objects representing recipient addresses and amounts.
+   * @param {string} options.output_Utxo[].address - The recipient's address.
+   * @param {number} options.output_Utxo[].amount - The amount of cryptocurrency to be sent, in integer units.
+   * @param {string} options.change_Address - The change address for the transaction.
+   *
+   * @param {string} headers.Authorization - The access token for authentication (Authorization header).
+   * @param {string} headers.Content-Type - The content type of the request (Content-Type header).
+   *
+   * @param {string} queryParams.walletId - The ID of the wallet associated with the transaction.
+   *
+   * @throws {Error} Throws an error if the transaction request fails.
+   * @return {Object} The headers of the response if successful.
+   */
+  async txSend(options, headers, queryParams) {
+    try {
+      await this.validate();
+      await this.validator.txSend(options);
+
+      const endpoint = '/tx/send';
+
+      const requestHeaders = {
+        'Authorization': headers.Authorization,
+        'Content-Type': headers['Content-Type'],
+        'walletID': queryParams.walletId,
+      };
+
+      const requestBody = {
+        Change_Address: options.change_Address,
+        Output_Utxo: options.output_Utxo,
+      };
+
+      const response = await this.request.postRequest(endpoint, requestBody, requestHeaders).then((res) => console.log(res)).catch((res) => console.log(res));
+
+      if (response instanceof Error) {
+        throw response;
+      }
+
+      return response.data;
+    } catch (error) {
+      throw new Error('Transaction request failed: ' + error);
+    }
+  }
+}

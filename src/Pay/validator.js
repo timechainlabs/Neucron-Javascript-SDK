@@ -51,5 +51,19 @@ class Validator {
 
     await schema.validateAsync(data);
   }
+
+  async txSend(data) {
+    const schema = Joi.object({
+      change_Address: Joi.string().required(),
+      output_Utxo: Joi.array().items(
+          Joi.object({
+            address: Joi.string().required(),
+            amount: Joi.number().integer().required(),
+          }),
+      ).required(),
+    });
+
+    await schema.validateAsync(data);
+  }
 }
 module.exports = new Validator;
