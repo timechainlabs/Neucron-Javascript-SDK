@@ -17,14 +17,9 @@ class Request {
 
   async postRequest(reqPath, data, headers, isAdmin, version = this.version.V1) {
     let url = baseURL;
-    if (isAdmin) {
-      url += `/admin/${version}${reqPath}`;
-    } else {
-      url += `/${version}${reqPath}`;
-    }
+    url += `${reqPath}`;
     const response = await axios.post(url, data, {
       headers: {
-        ...this.headers,
         ...headers,
       },
     });
