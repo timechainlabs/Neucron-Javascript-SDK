@@ -1,8 +1,6 @@
 const validator = require('./validator');
 const Request = require('../request');
 
-const baseUrl = 'https://dev.neucron.io';
-
 class Transaction {
   constructor(auth) {
     this.auth = auth;
@@ -28,7 +26,7 @@ class Transaction {
    * Initiates a transaction for a multiple payment channel operation. This function prepares and sends
    * a request to the designated API endpoint to create a transaction involving multiple output types.
    *
-   * @param {Object} options - Options for configuring the transaction.
+   * @param {{walletId: string}} options - Options for configuring the transaction.
    * @param {Object[]} options.input - An array of input objects representing UTXO sequence pairs.
    * @param {number} options.input[].SequenceNum - The sequence number of the input UTXO.
    * @param {number} options.input[].Utxo_index - The Index of the input UTXO.
@@ -86,49 +84,50 @@ class Transaction {
    *
    * @param {Object} options - The options for the payment channel transaction.
    * @param {string} options.walletID - The ID of the wallet initiating the transaction (query parameter).
-   * @param {Object} options.sendData - The data for the transaction.
-   * @param {string} options.sendData.address - The recipient's address.
-   * @param {number} options.sendData.amount - The amount of the transaction.
-   * @param {string} options.sendData.date - The date of the transaction (format: yyyy-mm-dd).
-   * @param {number} options.sendData.sequence_Num - The sequence number of the transaction.
-   * @param {string} options.sendData.time - The time of the transaction (format: hh:mm:ss).
-   * @param {string} options.accessToken - The access token for authentication (Authorization header).
-   * @return {Object} - The response data from the transaction.
+   * @param {Object} data - The data for the transaction.
+   * @param {string} data.reciver_address - The recipient's address.
+   * @param {number} data.amount - The amount of the transaction.
+   * @param {string} data.date - The date of the transaction (format: yyyy-mm-dd).
+   * @param {number} data.sequence_Num - The sequence number of the transaction.
+   * @param {string} data.time - The time of the transaction (format: hh:mm:ss).
+   * @param {string} headers.Authorization - The access token for authentication (Authorization header).
+   * @param {string} headers.Content-Type - The content type of the request (Content-Type header).
+   *
    * @throws {Error} - If the transaction fails or encounters an error.
+   * @returns {Object} - The response data from the transaction.
    */
-  async payChannelTxn(options) {
+
+  async payChannelTxn(queryParams, headers, data) {
     try {
       await this.validate();
-
-      await this.validator.payChannelTxn(options);
+      await this.validator.payChannelTransaction(data);
 
       const endpoint = '/tx/payc';
 
-      const headers = {
-        'Content-Type': 'application/json', // Assuming JSON payload
-        'Authorization': `${options.accessToken}`, // Assuming you have an access token
+      const requestHeaders = {
+        'Authorization': headers.Authorization,
+        'Content-Type': headers['Content-Type'],
+        'walletID': queryParams.walletId,
       };
 
       const requestBody = {
-        walletID: options.walletID,
-        sendRequest: {
-          address: options.sendData.address,
-          amount: options.sendData.amount,
-          date: options.sendData.date,
-          sequence_Num: options.sendData.sequence_Num,
-          time: options.sendData.time,
-        },
+        amount: data.amount,
+        date: data.date,
+        reciver_address: data.reciver_address,
+        sequence_Num: data.sequence_Num,
+        time: data.time,
       };
 
-      const response = await this.request.postRequest(baseUrl + endpoint, headers, requestBody);
+      await this.request.postRequest(endpoint, requestBody, requestHeaders);
+      const response = await this.request.postRequest(endpoint, requestBody, requestHeaders);
 
       if (response instanceof Error) {
         throw response;
       }
 
-      return response.data;
+      return response.headers;
     } catch (error) {
-      throw new Error(`payChannelTxn failed: ${error.message}`);
+      throw new Error('Transaction request failed: ' + error.message);
     }
   }
 }

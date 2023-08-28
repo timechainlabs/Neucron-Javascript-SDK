@@ -40,28 +40,16 @@ class Validator {
    * @param {string} options.changeAddress - The change address for the transaction.
    * @throws {Error} - If the options fail schema validation.
    */
-  async payChannelTxn(options) {
+  async payChannelTransaction(data) {
     const schema = Joi.object({
-      walletID: Joi.string().required(),
-      inputs: Joi.array().items(
-          Joi.object({
-            sequenceNum: Joi.number().integer().required(),
-            utxoId: Joi.number().integer().required(),
-          }),
-      ).required(),
-      lockTime: Joi.string().isoDate().required(),
-      outputs: Joi.array().items(
-          Joi.object({
-            amount: Joi.number().integer().required(),
-            asm: Joi.string().required(),
-          }),
-      ).required(),
-      changeAddress: Joi.string().required(),
+      amount: Joi.number().integer().required(),
+      date: Joi.string().isoDate().required(),
+      reciver_address: Joi.string().required(),
+      sequence_Num: Joi.number().integer().required(),
+      time: Joi.string().regex(/^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/).required(),
     });
 
-    await schema.validateAsync(options);
-    // Schema validation passed, proceed with the transaction logic
-    // ...
+    await schema.validateAsync(data);
   }
 }
 module.exports = new Validator;
