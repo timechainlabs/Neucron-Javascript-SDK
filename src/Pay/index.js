@@ -1,7 +1,7 @@
 const validator = require('./validator');
 const Request = require('../request');
 
-class Transaction{
+class Pay{
     constructor(auth) {
       this.auth = auth;
       this.validator = validator;
@@ -151,3 +151,6 @@ class Transaction{
         return resp.data;
       }
 }
+
+
+module.exports = Pay;
