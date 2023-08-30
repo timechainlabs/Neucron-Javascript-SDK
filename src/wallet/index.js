@@ -25,29 +25,38 @@ class Wallet {
    * @param {object} opts
    * @return {object} is response object `{statusCode: 'string', data: 'object'}`
    **/
-   async walletaddress(opts) {
+   async wallet_address(opts) {
     await this.validate();
 
     if (!opts) opts = {};
 
-    await this.validator.walletaddress(opts);
+    await this.validator.wallet_address(opts);
 
     const url = `/wallet/address`;
 
     const headers = {
-      authToken: this.auth.authToken,
+      
+      'X_Neucron_App_ID': opts.X_Neucron_App_ID,
+      'X_Neucron_Key_ID': opts.X_Neucron_Key_ID,
+      'X_Neucron_Key_Secret': opts.X_Neucron_Key_Secret,
+      'X_Neucron_User_ID': opts.X_Neucron_User_ID,
+    };
+    
+    const query = {
+
+      walletID: opts.walletID
     };
 
-    if (opts.walletId) headers.walletId = opts.walletId;
+    
 
-    const resp = await this.request.getRequest(url, headers);
+    const resp = await this.request.getRequest(url, headers, query, null, null);
 
     if (resp instanceof Error){
 
       throw resp;
     } 
 
-    return resp.headers;
+    return resp.data;
   }
 
    /**
@@ -55,25 +64,36 @@ class Wallet {
    * @param {object} opts
    * @return {object} is response object `{statusCode: 'string', data: 'object'}`
    **/
-   async walletaddress_create(opts) {
+   async wallet_address_create(opts) {
     await this.validate();
     if (!opts) opts = {};
-    await this.validator.walletaddress_create(opts);
+    await this.validator.wallet_address_create(opts);
     const url = `/wallet/address/create`;
+    
     const headers = {
-      // authToken: this.auth.authToken,
+      
+      'X_Neucron_App_ID': opts.X_Neucron_App_ID,
+      'X_Neucron_Key_ID': opts.X_Neucron_Key_ID,
+      'X_Neucron_Key_Secret': opts.X_Neucron_Key_Secret,
+      'X_Neucron_User_ID': opts.X_Neucron_User_ID,
     };
 
-    if (opts.walletID) headers.walletID = opts.walletID;
-    if (opts.path) headers.path = opts.path;
 
-    const resp = await this.request.getRequest(url, headers);
+    const query = {
+
+      walletID: opts.walletID,
+      path: opts.path
+    };
+   
+     
+
+    const resp = await this.request.getRequest(url, headers, query, null, null);
 
     if (resp instanceof Error){
       throw resp;
     } 
 
-    return resp.headers;
+    return resp.data;
   }
 
     /**
@@ -81,23 +101,35 @@ class Wallet {
    * @param {object} opts
    * @return {object} is response object `{statusCode: 'string', data: 'object'}`
    **/
-    async walletbalance(opts) {
+    async wallet_balance(opts) {
         await this.validate();
         if (!opts) opts = {};
-        await this.validator.walletbalance(opts);
+        await this.validator.wallet_balance(opts);
         const url = `/wallet/balance`;
-        const headers = {
-          // authToken: this.auth.authToken,
-        };
-        if (opts.walletID) headers.walletID = opts.walletID;
+        
 
-        const resp = await this.request.getRequest(url, headers);
+        const headers = {
+          
+          'X_Neucron_App_ID': opts.X_Neucron_App_ID,
+          'X_Neucron_Key_ID': opts.X_Neucron_Key_ID,
+          'X_Neucron_Key_Secret': opts.X_Neucron_Key_Secret,
+          'X_Neucron_User_ID': opts.X_Neucron_User_ID,
+        };
+
+        const query = {
+
+          walletID: opts.walletID,
+        
+        };
+        
+
+        const resp = await this.request.getRequest(url, headers, query, null, null);
 
         if (resp instanceof Error){
           throw resp;
         } 
 
-        return resp.headers;
+        return resp.data;
       }
 
    /**
@@ -111,19 +143,32 @@ class Wallet {
     if (!opts) opts = {};
 
     await this.validator.wallet_create(opts);
-    const url = `/wallet/create`;
-    const headers = {
-      // authToken: this.auth.authToken,
-    };
-    if (opts.mnemonic) headers.mnemonic = opts.mnemonic;
 
-    const resp = await this.request.postRequest(url, headers);
+
+    const url = `/wallet/create`;
+
+    const headers = {
+          
+      'X_Neucron_App_ID': opts.X_Neucron_App_ID,
+      'X_Neucron_Key_ID': opts.X_Neucron_Key_ID,
+      'X_Neucron_Key_Secret': opts.X_Neucron_Key_Secret,
+      'X_Neucron_User_ID': opts.X_Neucron_User_ID,
+    };
+
+    const query = {
+
+      mnemonic: opts.mnemonic,
+    
+    };
+    
+
+    const resp = await this.request.postRequest(url, headers, query, null, null);
 
     if (resp instanceof Error){
       throw resp;
     } 
 
-    return resp.headers;
+    return resp.data;
   }
 
   /**
@@ -131,7 +176,7 @@ class Wallet {
    * @param {object} opts
    * @return {object} is response object `{statusCode: 'string', data: 'object'}`
    **/
-  async walletdefault(opts) {
+  async wallet_default(opts) {
 
     await this.validate();
 
@@ -141,17 +186,27 @@ class Wallet {
 
     const url = `/wallet/default`;
 
+   
     const headers = {
-      // authToken: this.auth.authToken,
+          
+      'X_Neucron_App_ID': opts.X_Neucron_App_ID,
+      'X_Neucron_Key_ID': opts.X_Neucron_Key_ID,
+      'X_Neucron_Key_Secret': opts.X_Neucron_Key_Secret,
+      'X_Neucron_User_ID': opts.X_Neucron_User_ID,
     };
-    if (opts.walletID) headers.walletID = opts.walletID;
 
-    const resp = await this.request.postRequest(url, headers);
+    const query = {
+
+      walletID: opts.walletID
+    
+    };
+
+    const resp = await this.request.postRequest(url, headers, query, null, null);
 
     if (resp instanceof Error){
       throw resp;
     } 
-    return resp.headers;
+    return resp.data;
   }
 
   /**
@@ -168,17 +223,27 @@ class Wallet {
     await this.validator.wallet_history(opts);
 
     const url = `/wallet/history`;
+  
     const headers = {
-      // authToken: this.auth.authToken,
+          
+      'X_Neucron_App_ID': opts.X_Neucron_App_ID,
+      'X_Neucron_Key_ID': opts.X_Neucron_Key_ID,
+      'X_Neucron_Key_Secret': opts.X_Neucron_Key_Secret,
+      'X_Neucron_User_ID': opts.X_Neucron_User_ID,
     };
-    if (opts.walletID) headers.walletID = opts.walletID;
 
-    const resp = await this.request.postRequest(url, headers);
+    const query = {
+
+      walletID: opts.walletID
+    
+    };
+
+    const resp = await this.request.postRequest(url, headers, query, null, null);
 
     if (resp instanceof Error){
       throw resp;
     } 
-    return resp.headers;
+    return resp.data;
   }
 
   /**
@@ -197,17 +262,26 @@ class Wallet {
     const url = `/wallet/keys`;
 
     const headers = {
-      // authToken: this.auth.authToken,
+          
+      'X_Neucron_App_ID': opts.X_Neucron_App_ID,
+      'X_Neucron_Key_ID': opts.X_Neucron_Key_ID,
+      'X_Neucron_Key_Secret': opts.X_Neucron_Key_Secret,
+      'X_Neucron_User_ID': opts.X_Neucron_User_ID,
     };
-    if (opts.walletID) headers.walletID = opts.walletID;
 
-    const resp = await this.request.getRequest(url, headers);
+    const query = {
+
+      walletID: opts.walletID
+    
+    };
+
+    const resp = await this.request.getRequest(url, headers, query, null, null);
 
     if (resp instanceof Error){
       throw resp;
     } 
 
-    return resp.headers;
+    return resp.data;
   }
 
   /**
@@ -225,15 +299,20 @@ class Wallet {
     const url = `/wallet/list`;
 
     const headers = {
-      // authToken: this.auth.authToken,
+          
+      'X_Neucron_App_ID': opts.X_Neucron_App_ID,
+      'X_Neucron_Key_ID': opts.X_Neucron_Key_ID,
+      'X_Neucron_Key_Secret': opts.X_Neucron_Key_Secret,
+      'X_Neucron_User_ID': opts.X_Neucron_User_ID,
     };
-    const resp = await this.request.getRequest(url, headers);
+
+    const resp = await this.request.getRequest(url, headers, query, null, null);
 
     if (resp instanceof Error){
       throw resp;
     } 
 
-    return resp.headers;
+    return resp.data;
   }
 
     /**
@@ -252,16 +331,25 @@ class Wallet {
         const url = `/wallet/mnemonic`;
 
         const headers = {
-          // authToken: this.auth.authToken,
+          
+          'X_Neucron_App_ID': opts.X_Neucron_App_ID,
+          'X_Neucron_Key_ID': opts.X_Neucron_Key_ID,
+          'X_Neucron_Key_Secret': opts.X_Neucron_Key_Secret,
+          'X_Neucron_User_ID': opts.X_Neucron_User_ID,
         };
-        if (opts.D) headers.walletID = opts.walletID;
+    
+        const query = {
+    
+          walletID: opts.walletID
+        
+        };
 
-        const resp = await this.request.getRequest(url, headers);
+        const resp = await this.request.getRequest(url, headers, query, null, null);
 
         if (resp instanceof Error){
           throw resp;
         } 
-        return resp.headers;
+        return resp.data;
       }
 
    /**
@@ -279,17 +367,26 @@ class Wallet {
         const url = `/wallet/utxo`;
 
         const headers = {
-          // authToken: this.auth.authToken,
+          
+          'X_Neucron_App_ID': opts.X_Neucron_App_ID,
+          'X_Neucron_Key_ID': opts.X_Neucron_Key_ID,
+          'X_Neucron_Key_Secret': opts.X_Neucron_Key_Secret,
+          'X_Neucron_User_ID': opts.X_Neucron_User_ID,
         };
-        if (opts.walletID) headers.walletID = opts.walletID;
+    
+        const query = {
+    
+          walletID: opts.walletID
+        
+        };
 
-        const resp = await this.request.getRequest(url, headers);
+        const resp = await this.request.getRequest(url, headers, query, null, null);
 
         if (resp instanceof Error){
           throw resp;
         } 
 
-        return resp.headers;
+        return resp.data;
       }
 
    /**
@@ -307,17 +404,25 @@ class Wallet {
         const url = `/wallet/xpubkeys`;
 
         const headers = {
-          // authToken: this.auth.authToken,
+          
+          'X_Neucron_App_ID': opts.X_Neucron_App_ID,
+          'X_Neucron_Key_ID': opts.X_Neucron_Key_ID,
+          'X_Neucron_Key_Secret': opts.X_Neucron_Key_Secret,
+          'X_Neucron_User_ID': opts.X_Neucron_User_ID,
+        };
+    
+        const query = {
+    
+          walletID: opts.walletID
+        
         };
 
-        if (opts.walletID) headers.walletID = opts.walletID;
-
-        const resp = await this.request.getRequest(url, headers);
+        const resp = await this.request.getRequest(url, headers, query, null, null);
 
         if (resp instanceof Error){
           throw resp;
         } 
-        return resp.headers;
+        return resp.data;
       }
 }
 

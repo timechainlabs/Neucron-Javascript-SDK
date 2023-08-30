@@ -1,8 +1,15 @@
 const Joi = require('joi');
 
 class Validator {
+
+  async auth_forgot_password(opts) {
+    const schema = Joi.object({
+      email: Joi.string().required(),
+    }).required();
+    await schema.validateAsync(opts);
+  };
   
-  async signup(opts) {
+  async auth_login(opts) {
     const schema = Joi.object({
       email: Joi.string().email().required(),
       password: Joi.string().required(),
@@ -10,14 +17,25 @@ class Validator {
     await schema.validateAsync(opts);
   };
 
-  
-  async login(opts) {
+  async auth_phone(opts) {
+    const schema = Joi.object({
+      phone: Joi.string().required(),
+      country_code: Joi.string().required(),
+    }).required();
+    await schema.validateAsync(opts);
+  };
+
+  async signup(opts) {
     const schema = Joi.object({
       email: Joi.string().email().required(),
       password: Joi.string().required(),
     }).required();
+
     await schema.validateAsync(opts);
   };
+
+  
+  
 
   async resetPassword(opts) {
     const schema = Joi.object({
@@ -28,12 +46,7 @@ class Validator {
   };
 
   
-  async forgotPassword(opts) {
-    const schema = Joi.object({
-      email: Joi.string().required(),
-    }).required();
-    await schema.validateAsync(opts);
-  };
+  
 }
 module.exports = new Validator();
 

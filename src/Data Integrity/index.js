@@ -22,7 +22,7 @@ class Transaction{
     }
 
    /**
-   * upload file on Blockchain Bitcom
+   * upload large file on Blockchain Bitcom
    * @param {object} opts
    * @return {object} is response object `{statusCode: 'string', data: 'object'}`
    */
@@ -36,18 +36,29 @@ class Transaction{
         const url = `/tx/file`;
 
         const headers = {
-          // authToken: this.auth.authToken,
+          'Content-Type': 'application/json',
+          'X_Neucron_App_ID': opts.X_Neucron_App_ID,
+          'X_Neucron_Key_ID': opts.X_Neucron_Key_ID,
+          'X_Neucron_Key_Secret': opts.X_Neucron_Key_Secret,
+          'X_Neucron_User_ID': opts.X_Neucron_User_ID,
+        };
+
+        const query ={
           walletID: opts.walletID,
+        };
+
+        const formData = {
           upfile: opts.upfile,
         };
 
-        const resp = await this.request.postRequest(url, headers);
+
+        const resp = await this.request.postRequest(url, headers, query, null, formData);
 
         if (resp instanceof Error){
           throw resp;
         } 
 
-        return resp.headers;
+        return resp.data;
       }
 
    /**
@@ -64,7 +75,14 @@ class Transaction{
         const url = `/tx/mesign`;
 
         const headers = {
-          // authToken: this.auth.authToken,
+          'Content-Type': 'application/json',
+          'X_Neucron_App_ID': opts.X_Neucron_App_ID,
+          'X_Neucron_Key_ID': opts.X_Neucron_Key_ID,
+          'X_Neucron_Key_Secret': opts.X_Neucron_Key_Secret,
+          'X_Neucron_User_ID': opts.X_Neucron_User_ID,
+        };
+
+        const query ={
           walletID: opts.walletID,
         };
 
@@ -72,7 +90,7 @@ class Transaction{
           message: opts.message,
         };
 
-        const resp = await this.request.postRequest(url, opts.data, headers);
+        const resp = await this.request.postRequest(url, headers, query, data);
 
         if (resp instanceof Error){
           throw resp;
@@ -98,15 +116,22 @@ class Transaction{
         const url = `/tx/postdata`;
 
         const headers = {
-          // authToken: this.auth.authToken,
+          'Content-Type': 'application/json',
+          'X_Neucron_App_ID': opts.X_Neucron_App_ID,
+          'X_Neucron_Key_ID': opts.X_Neucron_Key_ID,
+          'X_Neucron_Key_Secret': opts.X_Neucron_Key_Secret,
+          'X_Neucron_User_ID': opts.X_Neucron_User_ID,
+        };
+
+        const query ={
           walletID: opts.walletID,
         };
 
         const data ={
           message: opts.message,
         };
-    
-        const resp = await this.request.postRequest(url, opts.data, headers);
+
+        const resp = await this.request.postRequest(url, headers, query, data);
 
         if (resp instanceof Error){
           throw resp;
@@ -129,17 +154,28 @@ class Transaction{
     const url = `/tx/upload`;
 
     const headers = {
-      // authToken: this.auth.authToken,
+      'Content-Type': 'application/json',
+      'X_Neucron_App_ID': opts.X_Neucron_App_ID,
+      'X_Neucron_Key_ID': opts.X_Neucron_Key_ID,
+      'X_Neucron_Key_Secret': opts.X_Neucron_Key_Secret,
+      'X_Neucron_User_ID': opts.X_Neucron_User_ID,
+    };
+
+    const query ={
       walletID: opts.walletID,
+    };
+
+    const formData = {
       upfile: opts.upfile,
     };
 
-    const resp = await this.request.postRequest(url, opts.data, headers);
+
+    const resp = await this.request.postRequest(url, headers, query, null, formData);
 
     if (resp instanceof Error){
       throw resp;
     } 
-    
+
     return resp.data;
   }
 }
