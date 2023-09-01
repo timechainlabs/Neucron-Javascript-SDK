@@ -21,7 +21,6 @@ class Transaction {
     }
   }
 
-  // eslint-disable-next-line valid-jsdoc
   /**
    * Initiates a transaction for a multiple payment channel operation. This function prepares and sends
    * a request to the designated API endpoint to create a transaction involving multiple output types.
@@ -131,7 +130,6 @@ class Transaction {
     }
   }
 
-  // eslint-disable-next-line valid-jsdoc
   /**
    * Initiates a transaction for sending cryptocurrency to multiple output addresses.
    *
