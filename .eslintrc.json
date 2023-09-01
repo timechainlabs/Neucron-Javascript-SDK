@@ -1,7 +1,7 @@
 {
     "env": {
         "browser": true,
-        "es2021": true,
+        "es2022": true,
         "node": true
     },
     "extends": [
@@ -12,10 +12,6 @@
         "sourceType": "module"
     },
     "rules": {
-      "new-cap":"off",
-      "no-invalid-this":"off",
-      "require-jsdoc": "off",
-      "max-len":"off",
       "no-console":"error"
     }
 }

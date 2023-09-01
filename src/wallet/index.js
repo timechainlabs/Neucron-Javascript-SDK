@@ -20,12 +20,12 @@ class Wallet {
       throw new Error('You must logged In. Try calling auth() method first');
     }
   }
-   /**
+  /**
    * get wallet address
    * @param {object} opts
    * @return {object} is response object `{statusCode: 'string', data: 'object'}`
    **/
-   async walletaddress(opts) {
+  async walletaddress(opts) {
     await this.validate();
 
     if (!opts) opts = {};
@@ -42,20 +42,19 @@ class Wallet {
 
     const resp = await this.request.getRequest(url, headers);
 
-    if (resp instanceof Error){
-
+    if (resp instanceof Error) {
       throw resp;
-    } 
+    }
 
     return resp.headers;
   }
 
-   /**
+  /**
    * get address
    * @param {object} opts
    * @return {object} is response object `{statusCode: 'string', data: 'object'}`
    **/
-   async walletaddress_create(opts) {
+  async walletaddress_create(opts) {
     await this.validate();
     if (!opts) opts = {};
     await this.validator.walletaddress_create(opts);
@@ -69,38 +68,38 @@ class Wallet {
 
     const resp = await this.request.getRequest(url, headers);
 
-    if (resp instanceof Error){
+    if (resp instanceof Error) {
       throw resp;
-    } 
+    }
 
     return resp.headers;
   }
 
-    /**
+  /**
    * get balance
    * @param {object} opts
    * @return {object} is response object `{statusCode: 'string', data: 'object'}`
    **/
-    async walletbalance(opts) {
-        await this.validate();
-        if (!opts) opts = {};
-        await this.validator.walletbalance(opts);
-        const url = `/wallet/balance`;
-        const headers = {
-          // authToken: this.auth.authToken,
-        };
-        if (opts.walletID) headers.walletID = opts.walletID;
+  async walletbalance(opts) {
+    await this.validate();
+    if (!opts) opts = {};
+    await this.validator.walletbalance(opts);
+    const url = `/wallet/balance`;
+    const headers = {
+      // authToken: this.auth.authToken,
+    };
+    if (opts.walletID) headers.walletID = opts.walletID;
 
-        const resp = await this.request.getRequest(url, headers);
+    const resp = await this.request.getRequest(url, headers);
 
-        if (resp instanceof Error){
-          throw resp;
-        } 
+    if (resp instanceof Error) {
+      throw resp;
+    }
 
-        return resp.headers;
-      }
+    return resp.headers;
+  }
 
-   /**
+  /**
    * return mnemonicPhrase data for creation of wallet
    * @param {object} opts
    * @return {object} is response object `{statusCode: 'string', data: 'object'}`
@@ -119,9 +118,9 @@ class Wallet {
 
     const resp = await this.request.postRequest(url, headers);
 
-    if (resp instanceof Error){
+    if (resp instanceof Error) {
       throw resp;
-    } 
+    }
 
     return resp.headers;
   }
@@ -132,7 +131,6 @@ class Wallet {
    * @return {object} is response object `{statusCode: 'string', data: 'object'}`
    **/
   async walletdefault(opts) {
-
     await this.validate();
 
     if (!opts) opts = {};
@@ -148,9 +146,9 @@ class Wallet {
 
     const resp = await this.request.postRequest(url, headers);
 
-    if (resp instanceof Error){
+    if (resp instanceof Error) {
       throw resp;
-    } 
+    }
     return resp.headers;
   }
 
@@ -160,7 +158,6 @@ class Wallet {
    * @return {object}
    **/
   async wallet_history(opts) {
-
     await this.validate();
 
     if (!opts) opts = {};
@@ -175,9 +172,9 @@ class Wallet {
 
     const resp = await this.request.postRequest(url, headers);
 
-    if (resp instanceof Error){
+    if (resp instanceof Error) {
       throw resp;
-    } 
+    }
     return resp.headers;
   }
 
@@ -187,7 +184,6 @@ class Wallet {
    * @return {object} is response object `{statusCode: 'string', data: 'object'}`
    **/
   async wallet_keys(opts) {
-
     await this.validate();
 
     if (!opts) opts = {};
@@ -203,9 +199,9 @@ class Wallet {
 
     const resp = await this.request.getRequest(url, headers);
 
-    if (resp instanceof Error){
+    if (resp instanceof Error) {
       throw resp;
-    } 
+    }
 
     return resp.headers;
   }
@@ -229,96 +225,95 @@ class Wallet {
     };
     const resp = await this.request.getRequest(url, headers);
 
-    if (resp instanceof Error){
+    if (resp instanceof Error) {
       throw resp;
-    } 
+    }
 
     return resp.headers;
   }
 
-    /**
+  /**
    * get mnemonic
    * @param {object} opts
    * @return {object} is response object `{statusCode: 'string', data: 'object'}`
    **/
-    async wallet_mnemonic(opts) {
+  async wallet_mnemonic(opts) {
+    await this.validate();
 
-        await this.validate();
+    if (!opts) opts = {};
 
-        if (!opts) opts = {};
+    await this.validator.wallet_mnemonic(opts);
 
-        await this.validator.wallet_mnemonic(opts);
+    const url = `/wallet/mnemonic`;
 
-        const url = `/wallet/mnemonic`;
+    const headers = {
+      // authToken: this.auth.authToken,
+    };
+    if (opts.D) headers.walletID = opts.walletID;
 
-        const headers = {
-          // authToken: this.auth.authToken,
-        };
-        if (opts.D) headers.walletID = opts.walletID;
+    const resp = await this.request.getRequest(url, headers);
 
-        const resp = await this.request.getRequest(url, headers);
+    if (resp instanceof Error) {
+      throw resp;
+    }
+    return resp.headers;
+  }
 
-        if (resp instanceof Error){
-          throw resp;
-        } 
-        return resp.headers;
-      }
-
-   /**
+  /**
    * get utxo
    * @param {object} opts
    * @return {object} is response object `{statusCode: 'string', data: 'object'}`
    **/
-    async wallet_utxo(opts) {
-        await this.validate();
+  async wallet_utxo(opts) {
+    await this.validate();
 
-        if (!opts) opts = {};
+    if (!opts) opts = {};
 
-        await this.validator.wallet_utxo(opts);
+    await this.validator.wallet_utxo(opts);
 
-        const url = `/wallet/utxo`;
+    const url = `/wallet/utxo`;
 
-        const headers = {
-          // authToken: this.auth.authToken,
-        };
-        if (opts.walletID) headers.walletID = opts.walletID;
+    const headers = {
+      // authToken: this.auth.authToken,
+    };
+    if (opts.walletID) headers.walletID = opts.walletID;
 
-        const resp = await this.request.getRequest(url, headers);
+    const resp = await this.request.getRequest(url, headers);
 
-        if (resp instanceof Error){
-          throw resp;
-        } 
+    if (resp instanceof Error) {
+      throw resp;
+    }
 
-        return resp.headers;
-      }
+    return resp.headers;
+  }
 
-   /**
+  /**
    * get x pubkey
    * @param {object} opts
    * @return {object} is response object `{statusCode: 'string', data: 'object'}`
    **/
-    async wallet_xpubkeys(opts) {
-        await this.validate();
+  async wallet_xpubkeys(opts) {
+    await this.validate();
 
-        if (!opts) opts = {};
+    if (!opts) opts = {};
 
-        await this.validator.wallet_xpubkeys(opts);
+    await this.validator.wallet_xpubkeys(opts);
 
-        const url = `/wallet/xpubkeys`;
+    const url = `/wallet/xpubkeys`;
 
-        const headers = {
-          // authToken: this.auth.authToken,
-        };
+    const headers = {
+      // authToken: this.auth.authToken,
+    };
 
-        if (opts.walletID) headers.walletID = opts.walletID;
+    if (opts.walletID) headers.walletID = opts.walletID;
 
-        const resp = await this.request.getRequest(url, headers);
+    const resp = await this.request.getRequest(url, headers);
 
-        if (resp instanceof Error){
-          throw resp;
-        } 
-        return resp.headers;
-      }
+    if (resp instanceof Error) {
+      throw resp;
+    }
+    return resp.headers;
+  }
 }
 
 module.exports = Wallet;

@@ -56,11 +56,7 @@ class Request {
 
   async getRequest(reqPath, headers, isAdmin, query, version = this.version.V1) {
     let url = baseURL;
-    if (isAdmin) {
-      url += `/admin/${version}${reqPath}`;
-    } else {
-      url += `/${version}${reqPath}`;
-    }
+    url += `${reqPath}`;
 
     if (query) {
       url += query;
@@ -68,7 +64,6 @@ class Request {
 
     const response = await axios.get(url, {
       headers: {
-        ...this.headers,
         ...headers,
       },
     });
