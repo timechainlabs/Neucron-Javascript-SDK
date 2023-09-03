@@ -1,1 +1,1 @@
-exports.baseURL = 'https://dev.neucron.io/docs/index.html#/';
+export const baseURL = 'https://dev.neucron.io';
