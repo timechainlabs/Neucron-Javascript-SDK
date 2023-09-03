@@ -1,27 +1,27 @@
-const validator = require('./validator');
-const Request = require('../request');
+import Request from '../request';
+import validator from './validator';
 
 class Transaction {
-  constructor(auth) {
-    this.auth = auth;
-    this.validator = validator;
-    this.request = new Request();
-  }
-  setAuthToken(token) {
-    this.authToken = token;
-  }
+	constructor(auth) {
+		this.auth = auth;
+		this.validator = validator;
+		this.request = new Request();
+	}
+	setAuthToken(token) {
+		this.authToken = token;
+	}
 
-  getAuthToken() {
-    return this.authToken;
-  }
+	getAuthToken() {
+		return this.authToken;
+	}
 
-  async validate() {
-    if (!this.auth.authToken) {
-      throw new Error('You must logged In. Try calling auth() method first');
-    }
-  }
+	async validate() {
+		if (!this.auth.authToken) {
+			throw new Error('You must logged In. Try calling auth() method first');
+		}
+	}
 
-  /**
+	/**
    * Initiates a transaction for a multiple payment channel operation. This function prepares and sends
    * a request to the designated API endpoint to create a transaction involving multiple output types.
    *
@@ -46,39 +46,39 @@ class Transaction {
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
-  async txMultipayc(options, headers, queryParams) {
-    try {
-      await this.validate();
-      await this.validator.txMultipayc(options);
+	async txMultipayc(options, headers, queryParams) {
+		try {
+			await this.validate();
+			await this.validator.txMultipayc(options);
 
-      const endpoint = '/tx/multipayc';
+			const endpoint = '/tx/multipayc';
 
-      const requestHeaders = {
-        'Authorization': headers.Authorization,
-        'Content-Type': headers['Content-Type'],
-        'walletID': queryParams.walletId,
-      };
+			const requestHeaders = {
+				'Authorization': headers.Authorization,
+				'Content-Type': headers['Content-Type'],
+				'walletID': queryParams.walletId,
+			};
 
-      const requestBody = {
-        Change_Address: options.Change_Address,
-        Input: options.Input,
-        LockTime: options.LockTime,
-        Outputs: options.Outputs,
-      };
+			const requestBody = {
+				Change_Address: options.Change_Address,
+				Input: options.Input,
+				LockTime: options.LockTime,
+				Outputs: options.Outputs,
+			};
 
-      const response = await this.request.postRequest(endpoint, requestBody, requestHeaders);
+			const response = await this.request.postRequest(endpoint, requestBody, requestHeaders);
 
-      if (response instanceof Error) {
-        throw response;
-      }
+			if (response instanceof Error) {
+				throw response;
+			}
 
-      return response.headers;
-    } catch (error) {
-      throw new Error('Transaction request failed: ' + error);
-    }
-  }
+			return response.headers;
+		} catch (error) {
+			throw new Error('Transaction request failed: ' + error);
+		}
+	}
 
-  /**
+	/**
    * Initiates a payment channel transaction.
    *
    * @param {Object} options - The options for the payment channel transaction.
@@ -96,41 +96,41 @@ class Transaction {
    * @returns {Object} - The response data from the transaction.
    */
 
-  async payChannelTxn(queryParams, headers, data) {
-    try {
-      await this.validate();
-      await this.validator.payChannelTransaction(data);
+	async payChannelTxn(queryParams, headers, data) {
+		try {
+			await this.validate();
+			await this.validator.payChannelTransaction(data);
 
-      const endpoint = '/tx/payc';
+			const endpoint = '/tx/payc';
 
-      const requestHeaders = {
-        'Authorization': headers.Authorization,
-        'Content-Type': headers['Content-Type'],
-        'walletID': queryParams.walletId,
-      };
+			const requestHeaders = {
+				'Authorization': headers.Authorization,
+				'Content-Type': headers['Content-Type'],
+				'walletID': queryParams.walletId,
+			};
 
-      const requestBody = {
-        amount: data.amount,
-        date: data.date,
-        reciver_address: data.reciver_address,
-        sequence_Num: data.sequence_Num,
-        time: data.time,
-      };
+			const requestBody = {
+				amount: data.amount,
+				date: data.date,
+				reciver_address: data.reciver_address,
+				sequence_Num: data.sequence_Num,
+				time: data.time,
+			};
 
-      await this.request.postRequest(endpoint, requestBody, requestHeaders);
-      const response = await this.request.postRequest(endpoint, requestBody, requestHeaders);
+			await this.request.postRequest(endpoint, requestBody, requestHeaders);
+			const response = await this.request.postRequest(endpoint, requestBody, requestHeaders);
 
-      if (response instanceof Error) {
-        throw response;
-      }
+			if (response instanceof Error) {
+				throw response;
+			}
 
-      return response.headers;
-    } catch (error) {
-      throw new Error('Transaction request failed: ' + error.message);
-    }
-  }
+			return response.headers;
+		} catch (error) {
+			throw new Error('Transaction request failed: ' + error.message);
+		}
+	}
 
-  /**
+	/**
    * Initiates a transaction for sending cryptocurrency to multiple output addresses.
    *
    * @param {{change_Address: string, output_Utxo: [{amount: number, address: string}]}} options - Options for configuring the transaction.
@@ -147,33 +147,35 @@ class Transaction {
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
-  async txSend(options, headers, queryParams) {
-    try {
-      await this.validate();
-      await this.validator.txSend(options);
+	async txSend(options, headers, queryParams) {
+		try {
+			await this.validate();
+			await this.validator.txSend(options);
 
-      const endpoint = '/tx/send';
+			const endpoint = '/tx/send';
 
-      const requestHeaders = {
-        'Authorization': headers.Authorization,
-        'Content-Type': headers['Content-Type'],
-        'walletID': queryParams.walletId,
-      };
+			const requestHeaders = {
+				'Authorization': headers.Authorization,
+				'Content-Type': headers['Content-Type'],
+				'walletID': queryParams.walletId,
+			};
 
-      const requestBody = {
-        Change_Address: options.change_Address,
-        Output_Utxo: options.output_Utxo,
-      };
+			const requestBody = {
+				Change_Address: options.change_Address,
+				Output_Utxo: options.output_Utxo,
+			};
 
-      const response = await this.request.postRequest(endpoint, requestBody, requestHeaders).then((res) => console.log(res)).catch((res) => console.log(res));
+			const response = await this.request.postRequest(endpoint, requestBody, requestHeaders).then((res) => console.log(res)).catch((res) => console.log(res));
 
-      if (response instanceof Error) {
-        throw response;
-      }
+			if (response instanceof Error) {
+				throw response;
+			}
 
-      return response.data;
-    } catch (error) {
-      throw new Error('Transaction request failed: ' + error);
-    }
-  }
+			return response.data;
+		} catch (error) {
+			throw new Error('Transaction request failed: ' + error);
+		}
+	}
 }
+
+export default Transaction;

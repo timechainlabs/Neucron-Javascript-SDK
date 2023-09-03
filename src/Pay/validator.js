@@ -1,31 +1,31 @@
-const Joi = require('joi');
+import Joi from 'joi';
 
 class Validator {
-  constructor() {
-  }
+	constructor() {
+	}
 
-  async txMultipayc(opts) {
-    const schema = Joi.object({
-      Input: Joi.array().items(
-          Joi.object({
-            SequenceNum: Joi.number().integer().required(),
-            Utxo_index: Joi.number().integer().required(),
-          }),
-      ),
-      LockTime: Joi.string().isoDate(),
-      Outputs: Joi.array().items(
-          Joi.object({
-            Amount: Joi.number().integer().required(),
-            Asm: Joi.string().required(),
-          }),
-      ),
-      Change_Address: Joi.string(),
-    });
+	async txMultipayc(opts) {
+		const schema = Joi.object({
+			Input: Joi.array().items(
+				Joi.object({
+					SequenceNum: Joi.number().integer().required(),
+					Utxo_index: Joi.number().integer().required(),
+				}),
+			),
+			LockTime: Joi.string().isoDate(),
+			Outputs: Joi.array().items(
+				Joi.object({
+					Amount: Joi.number().integer().required(),
+					Asm: Joi.string().required(),
+				}),
+			),
+			Change_Address: Joi.string(),
+		});
 
-    await schema.validateAsync(opts);
-  }
+		await schema.validateAsync(opts);
+	}
 
-  /**
+	/**
    * Initiates a payment channel transaction.
    *
    * @param {Object} options - The options for the payment channel transaction.
@@ -40,30 +40,31 @@ class Validator {
    * @param {string} options.changeAddress - The change address for the transaction.
    * @throws {Error} - If the options fail schema validation.
    */
-  async payChannelTransaction(data) {
-    const schema = Joi.object({
-      amount: Joi.number().integer().required(),
-      date: Joi.string().isoDate().required(),
-      reciver_address: Joi.string().required(),
-      sequence_Num: Joi.number().integer().required(),
-      time: Joi.string().regex(/^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/).required(),
-    });
+	async payChannelTransaction(data) {
+		const schema = Joi.object({
+			amount: Joi.number().integer().required(),
+			date: Joi.string().isoDate().required(),
+			reciver_address: Joi.string().required(),
+			sequence_Num: Joi.number().integer().required(),
+			time: Joi.string().regex(/^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/).required(),
+		});
 
-    await schema.validateAsync(data);
-  }
+		await schema.validateAsync(data);
+	}
 
-  async txSend(data) {
-    const schema = Joi.object({
-      change_Address: Joi.string().required(),
-      output_Utxo: Joi.array().items(
-          Joi.object({
-            address: Joi.string().required(),
-            amount: Joi.number().integer().required(),
-          }),
-      ).required(),
-    });
+	async txSend(data) {
+		const schema = Joi.object({
+			change_Address: Joi.string().required(),
+			output_Utxo: Joi.array().items(
+				Joi.object({
+					address: Joi.string().required(),
+					amount: Joi.number().integer().required(),
+				}),
+			).required(),
+		});
 
-    await schema.validateAsync(data);
-  }
+		await schema.validateAsync(data);
+	}
 }
-module.exports = new Validator;
+
+export default new Validator;

@@ -1,147 +1,148 @@
-const validator = require('./validator');
-const Request = require('../request');
+import Request from '../request';
+
+import validator from './validator';
 
 class Transaction{
-    constructor(auth) {
-      this.auth = auth;
-      this.validator = validator;
-      this.request = new Request();
-    }
-    setAuthToken(token) {
-      this.authToken = token;
-    }
-  
-    getAuthToken() {
-      return this.authToken;
-    }
-  
-    async validate() {
-      if (!this.auth.authToken) {
-        throw new Error('You must logged In. Try calling auth() method first');
-      }
-    }
+	constructor(auth) {
+		this.auth = auth;
+		this.validator = validator;
+		this.request = new Request();
+	}
+	setAuthToken(token) {
+		this.authToken = token;
+	}
 
-   /**
+	getAuthToken() {
+		return this.authToken;
+	}
+
+	async validate() {
+		if (!this.auth.authToken) {
+			throw new Error('You must logged In. Try calling auth() method first');
+		}
+	}
+
+	/**
    * upload file on Blockchain Bitcom
    * @param {object} opts
    * @return {object} is response object `{statusCode: 'string', data: 'object'}`
    */
 
-    async tx_file(opts) {
+	async tx_file(opts) {
 
-        await this.validate();
+		await this.validate();
 
-        await this.validator.tx_file(opts);
+		await this.validator.txFile(opts);
 
-        const url = `/tx/file`;
+		const url = '/tx/file';
 
-        const headers = {
-          // authToken: this.auth.authToken,
-          walletID: opts.walletID,
-          upfile: opts.upfile,
-        };
+		const headers = {
+			// authToken: this.auth.authToken,
+			walletID: opts.walletID,
+			upfile: opts.upfile,
+		};
 
-        const resp = await this.request.postRequest(url, headers);
+		const resp = await this.request.postRequest(url, headers);
 
-        if (resp instanceof Error){
-          throw resp;
-        } 
+		if (resp instanceof Error){
+			throw resp;
+		}
 
-        return resp.headers;
-      }
+		return resp.headers;
+	}
 
-   /**
+	/**
    * Signed by one of your wallet private key
    * @param {object} opts
    * @return {object} is response object `{statusCode: 'string', data: 'object'}`
    */
 
-    async tx_mesign(opts) {
-        await this.validate();
+	async tx_mesign(opts) {
+		await this.validate();
 
-        await this.validator.tx_mesign(opts);
+		await this.validator.txMeSign(opts);
 
-        const url = `/tx/mesign`;
+		const url = '/tx/mesign';
 
-        const headers = {
-          // authToken: this.auth.authToken,
-          walletID: opts.walletID,
-        };
+		const headers = {
+			// authToken: this.auth.authToken,
+			walletID: opts.walletID,
+		};
 
-        const data ={
-          message: opts.message,
-        };
+		const data ={
+			message: opts.message,
+		};
 
-        const resp = await this.request.postRequest(url, opts.data, headers);
+		const resp = await this.request.postRequest(url, opts.data, headers);
 
-        if (resp instanceof Error){
-          throw resp;
-        }
+		if (resp instanceof Error){
+			throw resp;
+		}
 
-        return resp.data;
-      }
+		return resp.data;
+	}
 
 
 
-   /**
+	/**
    * upload data on blockchain
    * @param {object} opts
    * @return {object} is response object `{statusCode: 'string', data: 'object'}`
    */
 
-    async tx_postdata(opts) {
+	async tx_postdata(opts) {
 
-        await this.validate();
+		await this.validate();
 
-        await this.validator.tx_postdata(opts);
+		await this.validator.txPostData(opts);
 
-        const url = `/tx/postdata`;
+		const url = '/tx/postdata';
 
-        const headers = {
-          // authToken: this.auth.authToken,
-          walletID: opts.walletID,
-        };
+		const headers = {
+			// authToken: this.auth.authToken,
+			walletID: opts.walletID,
+		};
 
-        const data ={
-          message: opts.message,
-        };
-    
-        const resp = await this.request.postRequest(url, opts.data, headers);
+		const data ={
+			message: opts.message,
+		};
 
-        if (resp instanceof Error){
-          throw resp;
-        } 
+		const resp = await this.request.postRequest(url, opts.data, headers);
 
-        return resp.data;
-      }
+		if (resp instanceof Error){
+			throw resp;
+		}
 
-  /**
+		return resp.data;
+	}
+
+	/**
    * upload file on blockchain 1 setordinal
    * @param {object} opts
    * @return {object} is response object `{statusCode: 'string', data: 'object'}`
    */
-  async tx_upload(opts) {
+	async tx_upload(opts) {
 
-    await this.validate();
+		await this.validate();
 
-    await this.validator.tx_upload(opts);
+		await this.validator.txUpload(opts);
 
-    const url = `/tx/upload`;
+		const url = '/tx/upload';
 
-    const headers = {
-      // authToken: this.auth.authToken,
-      walletID: opts.walletID,
-      upfile: opts.upfile,
-    };
+		const headers = {
+			// authToken: this.auth.authToken,
+			walletID: opts.walletID,
+			upfile: opts.upfile,
+		};
 
-    const resp = await this.request.postRequest(url, opts.data, headers);
+		const resp = await this.request.postRequest(url, opts.data, headers);
 
-    if (resp instanceof Error){
-      throw resp;
-    } 
-    
-    return resp.data;
-  }
+		if (resp instanceof Error){
+			throw resp;
+		}
+
+		return resp.data;
+	}
 }
 
 module.exports = Transaction;
