@@ -1,6 +1,6 @@
-import Request from '../request';
+import Request from '../request.js';
 
-import validator from './validator';
+import validator from './validator.js';
 
 class
 Authentication {

@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "@neucron/sdk",
   "version": "0.0.1",
   "description": "The official Neucron javascript SDK",
