@@ -25,15 +25,11 @@ class SmartContracts {
   /**
    * Initiates a transaction to send funds/data with custom script. This function prepares and sends
    * a request to the designated API endpoint to create a transaction.
-   *
    * @param {Object[]} options.script - custom script which you want to attach with your transaction.
    * @param {number} options.satoshi - amount of satoshi.
-   *
    * @param {string} headers.Authorization - The access token for authentication (Authorization header).
    * @param {string} headers.Content-Type - The content type of the request (Content-Type header).
-   *
    * @param {string} [queryParams.walletId] - The ID of the wallet associated with the transaction (optional).
-   *
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
@@ -77,7 +73,6 @@ class SmartContracts {
    * Initiates a transaction for a multiple payment channel operation. This function prepares and sends
    * a request to the designated API endpoint to create a transaction involving multiple output types.
    *
-   * @param {{walletId: string}} options - Options for configuring the transaction.
    * @param {Object[]} options.Input - An array of input objects representing UTXO sequence pairs.
    * @param {Object[]} options.Flag - An array of input objects representing UTXO sequence pairs.
    * @param {number} options.Input[].Sequence_Num - The sequence number of the input UTXO.
@@ -96,22 +91,28 @@ class SmartContracts {
    * @param {string} headers.Authorization - The access token for authentication (Authorization header).
    * @param {string} headers.Content-Type - The content type of the request (Content-Type header).
    *
-   * @param {string} queryParams.walletId - The ID of the wallet associated with the transaction.
+   * @param {string} [queryParams.walletId] - The ID of the wallet associated with the transaction (optional).
    *
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
-  async txMultiple(options, queryParams, headers) {
+  async txMultiple(options, headers,queryParams) {
 	try {
 	  await this.validate();
 	  await this.validator.txMultiple(options);
 
 	  const endpoint = '/tx/multiple';
 
-	  const requestHeaders = {
+	  let requestHeaders = {
 		'Authorization': headers.Authorization,
 		'Content-Type': headers['Content-Type'],
-		'walletID': queryParams.walletId,
+	  };
+
+	  if(queryParams && queryParams.walletId){
+		requestHeaders = {
+		  ...requestHeaders,
+		  walletId: queryParams.walletId
+		};
 	  };
 
 	  const requestBody = {
@@ -128,7 +129,7 @@ class SmartContracts {
 		throw response;
 	  }
 
-	  return response.headers;
+	  return response;
 	} catch (error) {
 	  throw new Error('Transaction request failed: ' + error.message);
 	}
@@ -162,6 +163,7 @@ class SmartContracts {
    * @return {Object} The headers of the response if successful.
    */
   async txSign(options, queryParams, headers) {
+	// TODO: Test This Endpoint [Workflow not tested - waiting[R&D]]
 	try {
 	  await this.validate();
 	  await this.validator.txSign(options);
@@ -211,23 +213,27 @@ class SmartContracts {
    */
   async txUnlock(options, queryParams, headers) {
 	try {
+	  // TODO: Test this endpoint
 	  await this.validate();
-	  await this.validator.txSign(options);
-
+	  await this.validator.txUnlock(options);
 	  const endpoint = '/tx/sign';
 
-	  const requestHeaders = {
+	  let requestHeaders = {
 		'Authorization': headers.Authorization,
 		'Content-Type': headers['Content-Type'],
-		'walletID': queryParams.walletId,
 	  };
 
+	  if (queryParams && queryParams.walletId) {
+		requestHeaders = {
+		  ...requestHeaders,
+		  walletID: queryParams.walletId,
+		};
+	  }
+
 	  const requestBody = {
-		Change_Address: options.Change_Address,
-		Flag: options.Flag,
-		Input: options.Input,
-		LockTime: options.LockTime,
-		Outputs: options.Outputs,
+		UnLocking_script: options.UnLocking_script,
+		output_Index: options.output_Index,
+		prevTxID: options.prevTxID
 	  };
 
 	  const response = await this.request.postRequest(endpoint, requestBody, requestHeaders);
@@ -236,7 +242,7 @@ class SmartContracts {
 		throw response;
 	  }
 
-	  return response.headers;
+	  return response;
 	} catch (error) {
 	  throw new Error('Transaction request failed: ' + error.message);
 	}
