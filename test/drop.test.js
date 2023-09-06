@@ -1,5 +1,5 @@
 const {expect} = require('chai');
-const validator = require('../src/Pay/validator'); // Update the path accordingly
+const validator = require('../src/pay/validator'); // Update the path accordingly
 const Joi = require('joi');
 
 describe('Validator', () => {

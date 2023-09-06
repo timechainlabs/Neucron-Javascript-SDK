@@ -1,8 +1,8 @@
 import Authentication from './authentication';
 import Wallet from './wallet';
-import Transaction from './Pay/index';
-import SmartContracts from './SmartContracts';
-import DataIntegrity from './DataIntegrity';
+import Transaction from './pay/index';
+import SmartContracts from './smart-contracts';
+import DataIntegrity from './data-integrity';
 
 class NeucronSDK {
 	constructor(config) {
