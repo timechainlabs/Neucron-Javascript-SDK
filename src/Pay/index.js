@@ -1,5 +1,5 @@
-import Request from '../request';
-import validator from './validator';
+import Request from '../request.js';
+import validator from './validator.js';
 
 class Transaction {
 	constructor(auth) {
@@ -165,7 +165,7 @@ class Transaction {
 				Output_Utxo: options.output_Utxo,
 			};
 
-			const response = await this.request.postRequest(endpoint, requestBody, requestHeaders).then((res) => console.log(res)).catch((res) => console.log(res));
+			const response = await this.request.postRequest(endpoint, requestBody, requestHeaders);
 
 			if (response instanceof Error) {
 				throw response;
