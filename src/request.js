@@ -5,12 +5,16 @@ import {baseURL} from './config.js';
 class Request {
 	constructor() {}
 
+  globalHeaders = {
+	'Content-Type': 'application/json'
+  };
+
 	async postRequest(reqPath, data, headers) {
 		let url = baseURL;
 		url += `${reqPath}`;
 		const response = await axios.post(url, data, {
 			headers: {
-				...headers,
+				...headers, ...this.globalHeaders
 			},
 		});
 		if (response.status < 400) {
@@ -43,10 +47,13 @@ class Request {
 		let url = baseURL;
 		url += `${reqPath}`;
 
+
 		if (query) {
 			url += query;
 		}
 
+	  // eslint-disable-next-line no-console
+		console.log(url);
 		const response = await axios.get(url, {
 			headers: {
 				...headers,
