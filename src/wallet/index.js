@@ -3,8 +3,6 @@ import validator from '../wallet/validator.js';
 
 class Wallet {
 
-  // TODO: write validators && test all these endpoints
-
   constructor(auth) {
 	this.auth = auth;
 	this.validator = validator;
@@ -84,7 +82,7 @@ class Wallet {
 	try {
 	  await this.validate();
 
-	  const endpoint = '/wallet/history';
+	  let endpoint = '/wallet/history';
 
 	  const requestBody = {};
 
@@ -93,19 +91,17 @@ class Wallet {
 		Authorization: this.auth.getAuthToken()
 	  };
 
-	  // if (options && options.walletId){
-		// requestHeaders = {
-		//   ...requestHeaders,
-		//   walletID: options.walletId
-		// };
-	  // }
+	  if (options && options.walletId){
 
-	  const response = await this.request.postRequest(endpoint, requestBody, requestHeaders);
+		endpoint += `?walletID=${options.walletId}`;
+	  }
+
+	  const response = await this.request.getRequest(endpoint, requestHeaders);
 
 	  if (response instanceof Error) {
 		throw response;
 	  }
-	  return response;
+	  return response.data.history;
 	} catch (error) {
 	  throw new Error('Unable to fetch transaction history: ' + error);
 	}
