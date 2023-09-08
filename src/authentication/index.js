@@ -29,27 +29,21 @@ class Authentication {
    * Lets a user sign up with email and password.
    * @param {string} options.password - password of user.
    * @param {string} options.email - email of user.
-   * @param {string} headers.Content-Type - The content type of the request (Content-Type header).
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
-  async signUp(options, headers) {
+  async signUp(options) {
 	try {
-	  await this.validate();
 	  await this.validator.signup(options);
 
 	  const endpoint = '/auth/signup';
-
-	  let requestHeaders = {
-		'Content-Type': headers['Content-Type'],
-	  };
 
 	  const requestBody = {
 		email: options.email,
 		password: options.password,
 	  };
 
-	  const response = await this.request.postRequest(endpoint, requestBody, requestHeaders);
+	  const response = await this.request.postRequest(endpoint, requestBody);
 
 	  if (response instanceof Error) {
 		throw response;
@@ -57,7 +51,7 @@ class Authentication {
 	  this.setAuthToken(response.data.access_token);
 	  return response;
 	} catch (error) {
-	  throw new Error('Authentication request failed: ' + error);
+	  throw new Error('Signup request failed: ' + error);
 	}
   }
 
@@ -65,64 +59,22 @@ class Authentication {
    * Lets a user login with email and password.
    * @param {string} options.password - password of user.
    * @param {string} options.email - email of user.
-   * @param {string} headers.Content-Type - The content type of the request (Content-Type header).
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
-  async login(options, headers) {
+  async login(options) {
 	try {
 	  await this.validate();
 	  await this.validator.login(options);
 
 	  const endpoint = '/auth/login';
 
-	  let requestHeaders = {
-		'Content-Type': headers['Content-Type'],
-	  };
-
 	  const requestBody = {
 		email: options.email,
 		password: options.password,
 	  };
 
-	  const response = await this.request.postRequest(endpoint, requestBody, requestHeaders);
-
-	  this.setAuthToken(response.data.access_token);
-	  if (response instanceof Error) {
-		throw response;
-	  }
-
-	  return response;
-	} catch (error) {
-	  throw new Error('Authentication request failed: ' + error);
-	}
-  }
-
-  /**
-   * Lets a user to reset password using token received on email
-   * @param {string} options.password - password of user.
-   * @param {string} options.token - token user get on email.
-   * @param {string} headers.ContentType - The content type of the request (Content-Type header).
-   * @throws {Error} Throws an error if the transaction request fails.
-   * @return {Object} The headers of the response if successful.
-   */
-  async resetPassword(options, headers) {
-	try {
-	  await this.validate();
-	  await this.validator.resetPassword(options);
-
-	  const endpoint = '/auth/login';
-
-	  let requestHeaders = {
-		'Content-Type': headers['Content-Type'],
-	  };
-
-	  const requestBody = {
-		email: options.email,
-		password: options.password,
-	  };
-
-	  const response = await this.request.postRequest(endpoint, requestBody, requestHeaders);
+	  const response = await this.request.postRequest(endpoint, requestBody);
 
 	  this.setAuthToken(response.data.access_token);
 	  if (response instanceof Error) {
@@ -137,28 +89,20 @@ class Authentication {
 
   /**
    * create token and send to user respective emailId
-   * @param {string} options.password - password of user.
-   * @param {string} options.token - token user get on email.
-   * @param {string} headers.Content-Type - The content type of the request (Content-Type header).
+   * @param {string} options.email - token user get on email.
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
-  async forgetPassword(headers, queryParams) {
+  async forgotPassword(options) {
 	try {
-	  await this.validate();
-	  await this.validator.validateQueryParamsOfForgotPassword(queryParams);
-
+	  await this.validator.forgotPassword(options);
 	  const endpoint = '/auth/forgot_password';
 
-	  let requestHeaders = {
-		'Content-Type': headers['Content-Type'],
-	  };
-
-	  const response = await this.request.getRequest(endpoint, requestHeaders, queryParams);
+	  const query = `?email=${options.email}`;
+	  const response = await this.request.getRequest(endpoint, {} , query);
 	  if (response instanceof Error) {
 		throw response;
 	  }
-
 	  return response;
 	} catch (error) {
 	  throw new Error('Processing failed: ' + error);
@@ -172,18 +116,13 @@ class Authentication {
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
-  async phone(query) {
+  async phone(options) {
 	try {
-	  await this.validate();
-	  await this.validator.phone(query);
+	  await this.validator.phone(options);
 
-	  const endpoint = '/auth/forgot_password';
-
-	  let requestHeaders = {
-		'Content-Type': headers['Content-Type'],
-	  };
-
-	  const response = await this.request.getRequest(endpoint, requestHeaders, query);
+	  const endpoint = '/auth/phone';
+	  const query = `?phone=${options.phone}&country_code=${options.country_code}`;
+	  const response = await this.request.postRequest(endpoint+query);
 	  if (response instanceof Error) {
 		throw response;
 	  }
@@ -222,19 +161,19 @@ class Authentication {
 
   /**
    * verify phone number using otp
-   * @param {string} query.phone - phone number of user.
-   * @param {string} query.otp - otp received by user over phone number.
+   * @param {string} options.phone - phone number of user.
+   * @param {string} options.otp - otp received by user over phone number.
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    **/
-  async verifyPhoneNo(query) {
-	await this.validator.verifyPhoneNo(query);
+  async verifyPhoneNo(options) {
+	await this.validator.verifyPhoneNo(options);
 
 	const url = '/auth/phone';
 
 	const headers = {
-	  phone: query.phone,
-	  otp: query.otp,
+	  phone: options.phone,
+	  otp: options.otp,
 	};
 
 	const resp = await this.request.postRequest(url, {}, headers);
@@ -245,7 +184,6 @@ class Authentication {
 	}
 	return resp.headers;
   }
-
 }
 
 export default Authentication;

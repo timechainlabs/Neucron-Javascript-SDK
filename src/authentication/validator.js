@@ -28,7 +28,7 @@ class Validator {
 	}
 
 
-	async validateQueryParamsOfForgotPassword(options) {
+	async forgotPassword(options) {
 		const schema = Joi.object({
 			email: Joi.string().required(),
 		}).required();
@@ -37,8 +37,8 @@ class Validator {
 
   async phone(options) {
 	const schema = Joi.object({
-	  phone: Joi.string().required(),
-	  country_code: Joi.string().required(),
+	  phone: Joi.any().required(),
+	  country_code: Joi.any().required(),
 	}).required();
 	await schema.validateAsync(options);
   }
@@ -46,8 +46,8 @@ class Validator {
 
   async verifyPhoneNo(options) {
 	const schema = Joi.object({
-	  phone: Joi.string().required(),
-	  otp: Joi.string().required(),
+	  phone: Joi.any().required(),
+	  otp: Joi.any().required(),
 	}).required();
 	await schema.validateAsync(options);
   }
