@@ -2,171 +2,188 @@ import Request from '../request.js';
 
 import validator from './validator.js';
 
-class
-Authentication {
-	constructor(config) {
-		this.authToken = config?.authToken;
-		this.validator = validator;
-		this.request = new Request();
-	}
+class Authentication {
 
-	setAuthToken(token) {
-		this.authToken = token;
-	}
+  // TODO: Test these endpoints
+  constructor(config) {
+	this.authToken = config?.authToken;
+	this.validator = validator;
+	this.request = new Request();
+  }
 
-	getAuthToken() {
-		return this.authToken;
-	}
+  setAuthToken(token) {
+	this.authToken = token;
+  }
 
-	async validate() {
-		if (!this.authToken)
-			throw new Error('You must logged In. Try calling auth() method first');
+  getAuthToken() {
+	return this.authToken;
+  }
+
+  async validate() {
+	if (!this.authToken) {
+	  throw new Error('You must logged In. Try calling auth() method first');
 	}
-	/**
-   * Lets a user sign up with email and password
-   *@param {object} opts
-   * @return {object}
+  }
+
+  /**
+   * Lets a user sign up with email and password.
+   * @param {string} options.password - password of user.
+   * @param {string} options.email - email of user.
+   * @throws {Error} Throws an error if the transaction request fails.
+   * @return {Object} The headers of the response if successful.
+   */
+  async signUp(options) {
+	try {
+	  await this.validator.signup(options);
+
+	  const endpoint = '/auth/signup';
+
+	  const requestBody = {
+		email: options.email,
+		password: options.password,
+	  };
+
+	  const response = await this.request.postRequest(endpoint, requestBody);
+
+	  if (response instanceof Error) {
+		throw response;
+	  }
+	  this.setAuthToken(response.data.access_token);
+	  return response;
+	} catch (error) {
+	  throw new Error('Signup request failed: ' + error);
+	}
+  }
+
+  /**
+   * Lets a user login with email and password.
+   * @param {string} options.password - password of user.
+   * @param {string} options.email - email of user.
+   * @throws {Error} Throws an error if the transaction request fails.
+   * @return {Object} The headers of the response if successful.
+   */
+  async login(options) {
+	try {
+	  await this.validate();
+	  await this.validator.login(options);
+
+	  const endpoint = '/auth/login';
+
+	  const requestBody = {
+		email: options.email,
+		password: options.password,
+	  };
+
+	  const response = await this.request.postRequest(endpoint, requestBody);
+
+	  this.setAuthToken(response.data.access_token);
+	  if (response instanceof Error) {
+		throw response;
+	  }
+
+	  return response;
+	} catch (error) {
+	  throw new Error('Authentication request failed: ' + error);
+	}
+  }
+
+  /**
+   * create token and send to user respective emailId
+   * @param {string} options.email - token user get on email.
+   * @throws {Error} Throws an error if the transaction request fails.
+   * @return {Object} The headers of the response if successful.
+   */
+  async forgotPassword(options) {
+	try {
+	  await this.validator.forgotPassword(options);
+	  const endpoint = '/auth/forgot_password';
+
+	  const query = `?email=${options.email}`;
+	  const response = await this.request.getRequest(endpoint, {} , query);
+	  if (response instanceof Error) {
+		throw response;
+	  }
+	  return response;
+	} catch (error) {
+	  throw new Error('Processing failed: ' + error);
+	}
+  }
+
+  /**
+   * Lets a user signup/login using phone number
+   * @param {string} options.phone - phone number of user.
+   * @param {string} options.country_code - country code of user.
+   * @throws {Error} Throws an error if the transaction request fails.
+   * @return {Object} The headers of the response if successful.
+   */
+  async phone(options) {
+	try {
+	  await this.validator.phone(options);
+
+	  const endpoint = '/auth/phone';
+	  const query = `?phone=${options.phone}&country_code=${options.country_code}`;
+	  const response = await this.request.postRequest(endpoint+query);
+	  if (response instanceof Error) {
+		throw response;
+	  }
+
+	  return response;
+	} catch (error) {
+	  throw new Error('Processing failed: ' + error);
+	}
+  }
+
+  /**
+   * Signup/login using phone number and send OTP if user doesnt exist then it will create fresh account
+   * @param {string} query.phone - phone number of user.
+   * @param {string} query.country_code - country code of user.
+   * @throws {Error} Throws an error if the transaction request fails.
+   * @return {Object} The headers of the response if successful.
    **/
-	async signUp(opts) {
-		await this.validator.signup(opts);
+  async sendOtp(query) {
+	await this.validator.phone(query);
 
-		const url = '/auth/signup';
+	const url = '/auth/phone';
 
-		const data = {
-			email: opts.email,
-			password: opts.password,
-		};
+	const headers = {
+	  phone: query.phone,
+	  countryCode: query.country_code,
+	};
 
-		const resp = await this.request.postRequest(url, data);
+	const resp = await this.request.postRequest(url, {}, headers);
 
-		if (resp instanceof Error) {
-			throw resp;
-		}
+	if (resp instanceof Error) {
 
-		this.setAuthToken(resp.data.token);
-		return resp.data;
+	  throw resp;
 	}
+	return resp.headers;
+  }
 
-	/**
-   * lets a user login with email and password
-   *@param {object} opts
-   * @return {object}
+  /**
+   * verify phone number using otp
+   * @param {string} options.phone - phone number of user.
+   * @param {string} options.otp - otp received by user over phone number.
+   * @throws {Error} Throws an error if the transaction request fails.
+   * @return {Object} The headers of the response if successful.
    **/
-	async login(opts) {
-		await this.validator.login(opts);
+  async verifyPhoneNo(options) {
+	await this.validator.verifyPhoneNo(options);
 
-		const url = '/auth/login';
+	const url = '/auth/phone';
 
-		const data = {
-			email: opts.email,
-			password: opts.password
-		};
+	const headers = {
+	  phone: options.phone,
+	  otp: options.otp,
+	};
 
-		const resp = await this.request.postRequest(url, data);
+	const resp = await this.request.postRequest(url, {}, headers);
 
-		if (resp instanceof Error){
+	if (resp instanceof Error) {
 
-			throw resp;
-		}
-		this.setAuthToken(resp.data.token);
-
-		return resp.data;
+	  throw resp;
 	}
-
-	/**
-   * called by client to update new password
-   * @param {object} opts
-   * @return {object}
-   **/
-	async resetPassword(opts) {
-		await this.validator.reset_password(opts);
-
-		const url = '/auth/reset_password';
-
-		const data = {
-			password: opts.password,
-			token: opts.token
-		};
-
-		const resp = await this.request.postRequest(url, data);
-
-		if (resp instanceof Error){
-
-			throw resp;
-		}
-		return resp.data;
-	}
-
-	/**
-   * called by client to reset password via recieving email
-   * @param {object} opts
-   * @return {object}
-   **/
-	async forgotPassword(opts) {
-		await this.validator.forgot_password(opts);
-
-		const url = '/auth/forgot_password';
-
-		const headers = {
-			email: opts.email
-		};
-
-		const resp = await this.request.getRequest(url, headers);
-
-		if (resp instanceof Error){
-
-			throw resp;
-		}
-		return resp.headers;
-	}
-
-	/**
-   * OTP login/signup
-   * @param {object} opts
-   * @return {object}
-   **/
-	async phone(opts) {
-		await this.validator.phone(opts);
-
-		const url = '/auth/phone';
-
-		const headers = {
-			phone: opts.phone,
-			countryCode: opts.country_code
-		};
-
-		const resp = await this.request.postRequest(url, headers);
-
-		if (resp instanceof Error){
-
-			throw resp;
-		}
-		return resp.headers;
-	}
-
-	/**
-   * verify auth OTP and get access token
-   * @param {object} opts
-   * @return {object}
-   **/
-	async verify(opts) {
-		await this.validator.verify(opts);
-
-		const url = '/auth/phone/verify';
-
-		const headers = {
-			phone: opts.phone,
-			OTP: opts.OTP
-		};
-
-		const resp = await this.request.getRequest(url, headers);
-
-		if (resp instanceof Error){
-
-			throw resp;
-		}
-		return resp.headers;
-	}
+	return resp.headers;
+  }
 }
 
 export default Authentication;
