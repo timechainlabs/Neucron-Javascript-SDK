@@ -3,6 +3,8 @@ const validator = require('./validator.js');
 
 class Wallet {
 
+  // TODO: write validators && test all these endpoints
+
   constructor(auth) {
 	this.auth = auth;
 	this.validator = validator;
@@ -240,127 +242,66 @@ class Wallet {
   }
 
   /**
-   * return coin & balances
-   * @param {object} opts
-   * @return {Promise<object>} is response object `{statusCode: 'string', data: 'object'}`
-   **/
-  async balance(opts) {
-	await this.validate();
-	if (!opts) opts = {};
-	await this.validator.balance(opts);
-	const url = '/balance';
-	const headers = {
-	  authToken: this.auth.authToken,
-	};
-	if (this.serviceId) headers.serviceId = this.serviceId;
-	if (opts.walletId) headers.walletId = opts.walletId;
-	if (opts.currency) headers.currency = opts.currency;
-	const resp = await this.request.getRequest(url, headers);
-	if (resp instanceof Error) throw resp;
-	return resp.data;
-  }
-
-  /**
-   * return all past transactions histories
-   * @param {object} opts
-   * @return {object}
-   **/
-  async history(opts) {
-	await this.validate();
-	if (!opts) opts = {};
-	await this.validator.history(opts);
-	const url = '/history';
-	const headers = {
-	  authToken: this.auth.authToken,
-	};
-	let query;
-	if (opts.nextPageToken) query =`nextPageToken=${opts.nextPageToken}`;
-	if (this.serviceId) headers.serviceId = this.serviceId;
-	if (opts.walletId) headers.walletId = opts.walletId;
-	if (opts.type) headers.type = opts.type;
-	const resp = await this.request.getRequest(url, headers, undefined, query);
-	if (resp instanceof Error) throw resp;
-	return resp.data;
-  }
-
-  /**
-   * list all wallets
-   * @param {object} opts
-   * @return {object} is response object `{statusCode: 'string', data: 'object'}`
-   **/
-  async wallets(opts) {
-	await this.validate();
-	if (!opts) opts = {};
-	await this.validator.wallets(opts);
-	const url = '/wallets';
-	const headers = {
-	  authToken: this.auth.authToken,
-	};
-	if (opts.oauth) headers.oauth = opts.oauth;
-	if (this.serviceId) headers.serviceId = this.serviceId;
-	const resp = await this.request.getRequest(url, headers);
-	if (resp instanceof Error) throw resp;
-	return resp.data;
-  }
-
-  /**
-   * return mnemonicPhrase data
-   * @param {object} opts
-   * @return {object} is response object `{statusCode: 'string', data: 'object'}`
-   **/
-  async mnemonic(opts) {
-	await this.validate();
-	if (!opts) opts = {};
-	await this.validator.mnemonic(opts);
-	const url = '/mnemonic';
-	const headers = {
-	  authToken: this.auth.authToken,
-	};
-	if (this.serviceId) headers.serviceId = this.serviceId;
-	if (opts.walletId) headers.walletId = opts.walletId;
-	const resp = await this.request.getRequest(url, headers);
-	if (resp instanceof Error) throw resp;
-	return resp.data;
-  }
-
-  /**
-   * delete a wallet w.r.t walletId
-   * @param {object} opts
-   * @return {object} is response object `{statusCode: 'string', data: 'object'}`
-   **/
-  async deleteWallet(opts) {
-	await this.validate();
-	if (!opts) opts = {};
-	await this.validator.deleteWallet(opts);
-	const url = '/wallet';
-	const headers = {
-	  authToken: this.auth.authToken,
-	};
-	if (this.serviceId) headers.serviceId = this.serviceId;
-	if (opts.walletId) headers.walletId = opts.walletId;
-	const resp = await this.request.deleteRequest(url, headers);
-	if (resp instanceof Error) throw resp;
-	return resp.data;
-  }
-
-  /**
-   * get leaderboard of tokenId
-   * @param {string} opts - is id of fungible or non-fungible bsv token
-   * @return {object} is response object `{statusCode: 'string', data: 'object'}`
+   * return list of wallets
+   * @param {string} headers.Content-Type - The content type of the request (Content-Type header).
+   * @throws {Error} Throws an error if the transaction request fails.
+   * @return {Object} The headers of the response if successful.
    */
-  async leaderboard(opts) {
-	await this.validator.leaderboard(opts);
-	const url = '/leaderboard';
-	const headers = {
-	  authToken: this.auth.authToken,
-	  tokenId: opts.tokenId,
-	};
-	if (this?.serviceId) headers.serviceId = this.serviceId;
-	let query;
-	if(opts?.nextPageToken) query = `?nextPageToken=${opts.nextPageToken}`;
-	const resp = await this.request.getRequest(url, headers, undefined, query);
-	if (resp instanceof Error) throw resp;
-	return resp.data;
+  async getAllWallet(headers) {
+	try {
+	  await this.validate();
+
+	  const endpoint = '/wallet/list';
+
+	  let requestHeaders = {
+		'Content-Type': headers['Content-Type'],
+	  };
+
+	  const response = await this.request.getRequest(endpoint, requestHeaders, {});
+
+	  if (response instanceof Error) {
+		throw response;
+	  }
+	  return response;
+	} catch (error) {
+	  throw new Error('Unable to fetch keys : ' + error);
+	}
+  }
+
+  /**
+   * return list of utxos
+   * @param {string} [query.walletId] - walletId of the user he want to run query on if not present then all utxos will return of user.
+   * @param {string} headers.Content-Type - The content type of the request (Content-Type header).
+   * @throws {Error} Throws an error if the transaction request fails.
+   * @return {Object} The headers of the response if successful.
+   */
+  async getAllUtxos(headers,query) {
+	try {
+	  await this.validate();
+	  await this.validator.getAllUtxos(query);
+
+	  const endpoint = '/wallet/utxo';
+
+	  let requestHeaders = {
+		'Content-Type': headers['Content-Type'],
+	  };
+
+	  if (query && query.walletId){
+		requestHeaders = {
+		  ...requestHeaders,
+		  walletID: query.walletId
+		};
+	  }
+
+	  const response = await this.request.getRequest(endpoint, requestHeaders, query);
+
+	  if (response instanceof Error) {
+		throw response;
+	  }
+	  return response;
+	} catch (error) {
+	  throw new Error('Unable to fetch keys : ' + error);
+	}
   }
 }
 
