@@ -4,7 +4,7 @@ import validator from './validator.js';
 
 class Authentication {
 
-  // TODO: Test these endpoints
+
   constructor(config) {
 	this.authToken = config?.authToken;
 	this.validator = validator;
@@ -64,7 +64,6 @@ class Authentication {
    */
   async login(options) {
 	try {
-	  await this.validate();
 	  await this.validator.login(options);
 
 	  const endpoint = '/auth/login';
