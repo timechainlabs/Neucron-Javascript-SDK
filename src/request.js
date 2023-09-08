@@ -52,8 +52,6 @@ class Request {
 			url += query;
 		}
 
-	  // eslint-disable-next-line no-console
-		console.log(url);
 		const response = await axios.get(url, {
 			headers: {
 				...headers,

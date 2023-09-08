@@ -1,5 +1,5 @@
-const Request = require('../request.js');
-const validator = require('./validator.js');
+import Request from '../request.js';
+import validator from '../wallet/validator.js';
 
 class Wallet {
 
@@ -12,30 +12,29 @@ class Wallet {
   }
 
   async validate() {
-	if (!this.auth.authToken) {
+	if (!this.auth.getAuthToken()) {
 	  throw new Error('You must logged In. Try calling auth() method first');
 	}
   }
 
   /**
    * Lets a user to create an wallet
-   * @param {string} [query.mnemonic] - using this mnemonic user can create an wallet (optional).
-   * @param {string} headers.Content-Type - The content type of the request (Content-Type header).
+   * @param {string} [options.mnemonic] - using this mnemonic user can create an wallet (optional).
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
-  async createWallet(headers,query) {
+  async createWallet(options) {
 	try {
-	  await this.validate();
-	  await this.validator.createWallet(query);
 
+	  await this.validate();
 	  const endpoint = '/wallet/create';
 
-	  let requestHeaders = {
-		'Content-Type': headers['Content-Type'],
-	  };
-
 	  const requestBody = {};
+
+	  const requestHeaders = {
+		...options,
+		Authorization: this.auth.getAuthToken()
+	  };
 
 	  const response = await this.request.postRequest(endpoint, requestBody, requestHeaders);
 
@@ -44,31 +43,27 @@ class Wallet {
 	  }
 	  return response;
 	} catch (error) {
-	  throw new Error('Authentication request failed: ' + error);
+	  throw new Error('Wallet creation failed: ' + error);
 	}
   }
 
   /**
    * Lets a user to set default wallet
    * @param {string} [query.walletId] - using this mnemonic user can create an wallet (optional).
-   * @param {string} headers.Content-Type - The content type of the request (Content-Type header).
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
-  async setDefaultWallet(headers,query) {
+  async setDefaultWallet(query) {
+
+	// TODO: R&D wrong config need to fix from neucron team
 	try {
 	  await this.validate();
-	  await this.validator.setDefaultWallet(query);
 
 	  const endpoint = '/wallet/default';
 
-	  let requestHeaders = {
-		'Content-Type': headers['Content-Type'],
-	  };
-
 	  const requestBody = {};
 
-	  const response = await this.request.postRequest(endpoint, requestBody, requestHeaders);
+	  const response = await this.request.postRequest(endpoint, requestBody, query);
 
 	  if (response instanceof Error) {
 		throw response;
@@ -81,30 +76,29 @@ class Wallet {
 
   /**
    * get transaction history of corresponding walletId if not passed then default wallet transaction history will return
-   * @param {string} [query.walletId] - using this mnemonic user can create an wallet (optional).
-   * @param {string} headers.Content-Type - The content type of the request (Content-Type header).
+   * @param {string} [options.walletId] - using this mnemonic user can create an wallet (optional).
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
-  async getWalletHistory(headers,query) {
+  async getWalletHistory(options) {
 	try {
 	  await this.validate();
-	  await this.validator.getTransactionHistory(query);
 
 	  const endpoint = '/wallet/history';
 
+	  const requestBody = {};
+
 	  let requestHeaders = {
-		'Content-Type': headers['Content-Type'],
+		...options,
+		Authorization: this.auth.getAuthToken()
 	  };
 
-	  if (query && query.walletId){
-		requestHeaders = {
-		  ...requestHeaders,
-		  walletID: query.walletId
-		};
-	  }
-
-	  const requestBody = {};
+	  // if (options && options.walletId){
+		// requestHeaders = {
+		//   ...requestHeaders,
+		//   walletID: options.walletId
+		// };
+	  // }
 
 	  const response = await this.request.postRequest(endpoint, requestBody, requestHeaders);
 
@@ -148,23 +142,27 @@ class Wallet {
 
   /**
    * get wallet addresses if wallet is not passed then default wallet addresses will be returned
-   * @param {string} [query.walletId] - using this mnemonic user can create an wallet (optional).
-   * @param {string} headers.Content-Type - The content type of the request (Content-Type header).
+   * @param {string} [options.walletId] - using this mnemonic user can create an wallet (optional).
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
-  async getWalletAddresses(headers,query) {
+  async getAddressesByWalletId(options) {
 	try {
 	  await this.validate();
-	  await this.validator.getWalletAddresses(query);
+
 
 	  const endpoint = '/wallet/address';
+	  let requestUrl = endpoint;
 
-	  let requestHeaders = {
-		'Content-Type': headers['Content-Type'],
+		let requestHeaders = {
+		Authorization: this.auth.getAuthToken()
 	  };
 
-	  const response = await this.request.getRequest(endpoint, requestHeaders, query);
+	  if (options && options.walletId){
+		requestUrl += `?walletID=${options.walletId}`;
+	  }
+
+	  const response = await this.request.getRequest(requestUrl, requestHeaders);
 	  if (response instanceof Error) {
 		throw response;
 	  }
@@ -184,6 +182,7 @@ class Wallet {
    * @return {Object} The headers of the response if successful.
    */
   async getWalletAddressByPath(headers,query) {
+	// TODO: R&D Pending in Neucron
 	try {
 	  await this.validate();
 	  await this.validator.getWalletAddressByPath(query);
@@ -207,35 +206,30 @@ class Wallet {
 
   /**
    * get keys of corresponding walletId if not passed then default wallet keys will return
-   * @param {string} [query.walletId] - walletId of the user he want to run query on.
-   * @param {string} headers.Content-Type - The content type of the request (Content-Type header).
+   * @param {string} [options.walletId] - walletId of the user he want to run options on.
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
-  async getWalletKeys(headers,query) {
+  async getWalletKeys(options) {
 	try {
 	  await this.validate();
-	  await this.validator.getWalletKeys(query);
 
-	  const endpoint = '/wallet/keys';
+	  let endpoint = '/wallet/keys';
 
-	  let requestHeaders = {
-		'Content-Type': headers['Content-Type'],
+	  const requestHeaders = {
+		Authorization: this.auth.getAuthToken()
 	  };
 
-	  if (query && query.walletId){
-		requestHeaders = {
-		  ...requestHeaders,
-		  walletID: query.walletId
-		};
+	  if (options && options.walletId){
+		endpoint += `?walletID=${options.walletId}`;
 	  }
 
-	  const response = await this.request.getRequest(endpoint, requestHeaders, query);
+	  const response = await this.request.getRequest(endpoint, requestHeaders);
 
 	  if (response instanceof Error) {
 		throw response;
 	  }
-	  return response;
+	  return response.data.keys;
 	} catch (error) {
 	  throw new Error('Unable to fetch keys : ' + error);
 	}
@@ -243,62 +237,56 @@ class Wallet {
 
   /**
    * return list of wallets
-   * @param {string} headers.Content-Type - The content type of the request (Content-Type header).
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
-  async getAllWallet(headers) {
+  async getAllWallet() {
 	try {
 	  await this.validate();
 
 	  const endpoint = '/wallet/list';
 
 	  let requestHeaders = {
-		'Content-Type': headers['Content-Type'],
+		Authorization: this.auth.getAuthToken()
 	  };
 
-	  const response = await this.request.getRequest(endpoint, requestHeaders, {});
+	  const response = await this.request.getRequest(endpoint, requestHeaders);
 
 	  if (response instanceof Error) {
 		throw response;
 	  }
-	  return response;
+	  return response.data.details.Wallets;
 	} catch (error) {
-	  throw new Error('Unable to fetch keys : ' + error);
+	  throw new Error('Unable to fetch wallet Ids : ' + error);
 	}
   }
 
   /**
    * return list of utxos
-   * @param {string} [query.walletId] - walletId of the user he want to run query on if not present then all utxos will return of user.
-   * @param {string} headers.Content-Type - The content type of the request (Content-Type header).
+   * @param {string} [options.walletId] - walletId of the user he want to run options on if not present then all utxos will return of user.
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
-  async getAllUtxos(headers,query) {
+  async getAllUtxos(options) {
 	try {
 	  await this.validate();
-	  await this.validator.getAllUtxos(query);
 
-	  const endpoint = '/wallet/utxo';
+	  let endpoint = '/wallet/utxo';
 
-	  let requestHeaders = {
-		'Content-Type': headers['Content-Type'],
+	  const requestHeaders = {
+		Authorization: this.auth.getAuthToken()
 	  };
 
-	  if (query && query.walletId){
-		requestHeaders = {
-		  ...requestHeaders,
-		  walletID: query.walletId
-		};
+	  if (options && options.walletId){
+		endpoint += `?walletID=${options.walletId}`;
 	  }
 
-	  const response = await this.request.getRequest(endpoint, requestHeaders, query);
+	  const response = await this.request.getRequest(endpoint, requestHeaders);
 
 	  if (response instanceof Error) {
 		throw response;
 	  }
-	  return response;
+	  return response.data.list;
 	} catch (error) {
 	  throw new Error('Unable to fetch keys : ' + error);
 	}

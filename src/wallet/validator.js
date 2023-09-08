@@ -1,17 +1,6 @@
-const Joi = require('joi');
-
+import Joi from 'joi';
 
 class Validator {
-  async createWallet(opts) {
-	const schema = Joi.object({
-	  serviceId: Joi.string().allow('', null),
-	  walletTitle: Joi.string().required(),
-	  type: Joi.string().allow('', null),
-	  walletLogo: Joi.string().allow('', null),
-	  walletPassword: Joi.string().allow('', null),
-	}).required();
-	await schema.validateAsync(opts);
-  };
 
   async metrics(opts) {
 	const schema = Joi.object({
@@ -90,4 +79,4 @@ class Validator {
 }
 
 
-module.exports = new Validator;
+export default Validator;
