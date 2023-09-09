@@ -25,31 +25,25 @@ class SmartContracts {
   /**
    * Initiates a transaction to send funds/data with custom script. This function prepares and sends
    * a request to the designated API endpoint to create a transaction.
-   * @param {Object[]} options.script - custom script which you want to attach with your transaction.
+   * @param {string} options.script - custom script which you want to attach with your transaction.
    * @param {number} options.satoshi - amount of satoshi.
-   * @param {string} headers.Authorization - The access token for authentication (Authorization header).
-   * @param {string} headers.Content-Type - The content type of the request (Content-Type header).
    * @param {string} [queryParams.walletId] - The ID of the wallet associated with the transaction (optional).
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
-  async txAsm(options, headers, queryParams) {
+  async txAsm(options, queryParams) {
 	try {
 	  await this.validate();
 	  await this.validator.txAsm(options);
 
-	  const endpoint = '/tx/asm';
+	  let endpoint = '/tx/asm';
 
 	  let requestHeaders = {
-		'Authorization': headers.Authorization,
-		'Content-Type': headers['Content-Type'],
+		Authorization: this.auth.getAuthToken(),
 	  };
 
 	  if (queryParams && queryParams.walletId) {
-		requestHeaders = {
-		  ...requestHeaders,
-		  'walletID': queryParams.walletId,
-		};
+		endpoint += `?walletID=${queryParams.walletId}`;
 	  }
 
 	  const requestBody = {
