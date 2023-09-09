@@ -44,7 +44,7 @@ class Validator {
 		const schema = Joi.object({
 			amount: Joi.number().integer().required(),
 			date: Joi.string().isoDate().required(),
-			reciver_address: Joi.string().required(),
+		  receiver_address: Joi.string().required(),
 			sequence_Num: Joi.number().integer().required(),
 			time: Joi.string().regex(/^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/).required(),
 		});
@@ -54,7 +54,6 @@ class Validator {
 
 	async txSend(data) {
 		const schema = Joi.object({
-			change_Address: Joi.string().required(),
 			output_Utxo: Joi.array().items(
 				Joi.object({
 					address: Joi.string().required(),
