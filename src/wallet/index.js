@@ -84,10 +84,7 @@ class Wallet {
 
 	  let endpoint = '/wallet/history';
 
-	  const requestBody = {};
-
 	  let requestHeaders = {
-		...options,
 		Authorization: this.auth.getAuthToken()
 	  };
 
@@ -109,23 +106,26 @@ class Wallet {
 
   /**
    * get wallet balance if wallet is not passed then default wallet balance will be returned
-   * @param {string} [query.walletId] - using this mnemonic user can create an wallet (optional).
-   * @param {string} headers.Content-Type - The content type of the request (Content-Type header).
+   * @param {string} [options.walletId] - using this mnemonic user can create an wallet (optional).
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
-  async getWalletBalance(headers,query) {
+  async getWalletBalance(options) {
 	try {
 	  await this.validate();
-	  await this.validator.getWalletBalance(query);
 
-	  const endpoint = '/wallet/balance';
+	  let endpoint = '/wallet/balance';
 
-	  let requestHeaders = {
-		'Content-Type': headers['Content-Type'],
+	  if (options && options.walletId){
+
+		endpoint += `?walletID=${options.walletId}`;
+	  }
+
+	  const requestHeaders = {
+		Authorization: this.auth.getAuthToken()
 	  };
 
-	  const response = await this.request.getRequest(endpoint, requestHeaders, query);
+	  const response = await this.request.getRequest(endpoint, requestHeaders);
 	  if (response instanceof Error) {
 		throw response;
 	  }
