@@ -118,11 +118,7 @@ class DataIntegrity {
    * Function to post data on blockchain
    *
    * @param {string} options.message - message to post on blockchain.
-   * @param {string} headers.Authorization - The access token for authentication (Authorization header).
-   * @param {string} headers.ContentType - The content type of the request (Content-Type header).
-   *
    * @param {string} queryParams.walletId - The ID of the wallet associated with the transaction.
-   *
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
@@ -134,20 +130,15 @@ class DataIntegrity {
 
 	  await this.validator.txPostData(options);
 
-	  const url = '/tx/postdata';
+	  let url = '/tx/postdata';
 
 	  let requestHeaders = {
-		'Authorization': headers.Authorization,
-		'Content-Type': headers['Content-Type'],
+		'Authorization': this.auth.getAuthToken()
 	  };
 
 	  if (queryParams && queryParams.walletId) {
-		requestHeaders = {
-		  ...requestHeaders,
-		  walletId: queryParams.walletId,
-		};
-	  }
-	  ;
+		url += '?walletID=' + queryParams.walletId;
+	  };
 
 	  const response = await this.request.postRequest(url, options, requestHeaders);
 	  if (response instanceof Error) {

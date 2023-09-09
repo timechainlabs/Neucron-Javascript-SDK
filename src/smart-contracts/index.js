@@ -43,7 +43,7 @@ class SmartContracts {
 	  };
 
 	  if (queryParams && queryParams.walletId) {
-		endpoint += `?walletID=${queryParams.walletId}`;
+		endpoint += '?walletID=' + queryParams.walletId;
 	  }
 
 	  const requestBody = {
