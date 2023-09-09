@@ -1,7 +1,7 @@
 import Request from '../request.js';
 import validator from './validator.js';
 
-class Transaction {
+class Pay {
 	constructor(auth) {
 		this.auth = auth;
 		this.validator = validator;
@@ -25,7 +25,7 @@ class Transaction {
    * Initiates a transaction for a multiple payment channel operation. This function prepares and sends
    * a request to the designated API endpoint to create a transaction involving multiple output types.
    *
-   * @param {{walletId: string}} options - Options for configuring the transaction.
+   * @param @param {string} [options.changeAddress] - address at which remaining funds will come (Optional).
    * @param {Object[]} options.input - An array of input objects representing UTXO sequence pairs.
    * @param {number} options.input[].SequenceNum - The sequence number of the input UTXO.
    * @param {number} options.input[].Utxo_index - The Index of the input UTXO.
@@ -36,45 +36,54 @@ class Transaction {
    *                                           Example: 100.
    * @param {string} options.outputs[].Asm - The script assembly (ASM) code for the output.
    *                                        Example: "OP_2 OP_2 OP_ADD OP_EQUAL".
-   * @param {string} options.changeAddress - The change address for the transaction.
-   *
-   * @param {string} headers.Authorization - The access token for authentication (Authorization header).
-   * @param {string} headers.Content-Type - The content type of the request (Content-Type header).
-   *
-   * @param {string} queryParams.walletId - The ID of the wallet associated with the transaction.
-   *
+   * @param {string} [queryParams.walletId] - The ID of the wallet associated with the transaction.
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
-	async txMultipayc(options, headers, queryParams) {
+	async txMultipayc(options,queryParams) {
+
+	  // TODO: test this endpoint
 		try {
 			await this.validate();
 			await this.validator.txMultipayc(options);
 
 			const endpoint = '/tx/multipayc';
 
-			const requestHeaders = {
-				'Authorization': headers.Authorization,
-				'Content-Type': headers['Content-Type'],
-				'walletID': queryParams.walletId,
+			let requestHeaders = {
+				'Authorization': this.auth.getAuthToken()
 			};
 
+			if (queryParams && queryParams.walletId){
+			  requestHeaders = {
+				...requestHeaders,
+				'walletID': queryParams.walletId,
+			  };
+			}
+
+			if (queryParams && queryParams.changeAddress){
+			  requestHeaders = {
+				...requestHeaders,
+				Change_Address: queryParams.changeAddress
+			  };
+			}
+
 			const requestBody = {
-				Change_Address: options.Change_Address,
 				Input: options.Input,
 				LockTime: options.LockTime,
 				Outputs: options.Outputs,
 			};
 
+		  // eslint-disable-next-line no-console
+			console.log(endpoint, requestBody, requestHeaders);
 			const response = await this.request.postRequest(endpoint, requestBody, requestHeaders);
 
 			if (response instanceof Error) {
 				throw response;
 			}
 
-			return response.headers;
+			return response;
 		} catch (error) {
-			throw new Error('Transaction request failed: ' + error);
+			throw new Error('Pay request failed: ' + error);
 		}
 	}
 
@@ -82,42 +91,36 @@ class Transaction {
    * Initiates a payment channel transaction.
    *
    * @param {Object} options - The options for the payment channel transaction.
-   * @param {string} options.walletID - The ID of the wallet initiating the transaction (query parameter).
-   * @param {Object} data - The data for the transaction.
-   * @param {string} data.reciver_address - The recipient's address.
-   * @param {number} data.amount - The amount of the transaction.
-   * @param {string} data.date - The date of the transaction (format: yyyy-mm-dd).
-   * @param {number} data.sequence_Num - The sequence number of the transaction.
-   * @param {string} data.time - The time of the transaction (format: hh:mm:ss).
-   * @param {string} headers.Authorization - The access token for authentication (Authorization header).
-   * @param {string} headers.Content-Type - The content type of the request (Content-Type header).
+   * @param {string} options.receiver_address - The recipient's address.
+   * @param {number} options.amount - The amount of the transaction.
+   * @param {string} options.date - The date of the transaction (format: yyyy-mm-dd).
+   * @param {number} options.sequence_Num - The sequence number of the transaction.
+   * @param {string} options.time - The time of the transaction (format: hh:mm:ss).
    *
    * @throws {Error} - If the transaction fails or encounters an error.
-   * @returns {Object} - The response data from the transaction.
+   * @returns {Object} - The response options from the transaction.
    */
-
-	async payChannelTxn(queryParams, headers, data) {
+	async payChannelTxn( options) {
 		try {
 			await this.validate();
-			await this.validator.payChannelTransaction(data);
+			await this.validator.payChannelTransaction(options);
 
 			const endpoint = '/tx/payc';
 
 			const requestHeaders = {
-				'Authorization': headers.Authorization,
-				'Content-Type': headers['Content-Type'],
-				'walletID': queryParams.walletId,
+			  Authorization: this.auth.getAuthToken()
 			};
 
 			const requestBody = {
-				amount: data.amount,
-				date: data.date,
-				reciver_address: data.reciver_address,
-				sequence_Num: data.sequence_Num,
-				time: data.time,
+				'amount': options.amount,
+				'date': options.date,
+				'reciver_address': options.receiver_address,
+				'sequence_Num': options.sequence_Num,
+				'time': options.time,
 			};
 
-			await this.request.postRequest(endpoint, requestBody, requestHeaders);
+		  // eslint-disable-next-line no-console
+			console.log(endpoint,requestBody,requestHeaders);
 			const response = await this.request.postRequest(endpoint, requestBody, requestHeaders);
 
 			if (response instanceof Error) {
@@ -126,56 +129,55 @@ class Transaction {
 
 			return response.headers;
 		} catch (error) {
-			throw new Error('Transaction request failed: ' + error.message);
+			throw new Error('Pay request failed: ' + error.message);
 		}
 	}
 
 	/**
    * Initiates a transaction for sending cryptocurrency to multiple output addresses.
    *
-   * @param {{change_Address: string, output_Utxo: [{amount: number, address: string}]}} options - Options for configuring the transaction.
+   * @param {{output_Utxo: [{amount: number, address: string}]}} options - Options for configuring the transaction.
    * @param {Object[]} options.output_Utxo - An array of output objects representing recipient addresses and amounts.
    * @param {string} options.output_Utxo[].address - The recipient's address.
    * @param {number} options.output_Utxo[].amount - The amount of cryptocurrency to be sent, in integer units.
-   * @param {string} options.change_Address - The change address for the transaction.
-   *
-   * @param {string} headers.Authorization - The access token for authentication (Authorization header).
-   * @param {string} headers.Content-Type - The content type of the request (Content-Type header).
-   *
-   * @param {string} queryParams.walletId - The ID of the wallet associated with the transaction.
+   * @param {string} [queryParams.changeAddress] - The change address for the transaction (Optional).
+   * @param {string} [queryParams.walletId] - The ID of the wallet associated with the transaction (Optional).
    *
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
-	async txSend(options, headers, queryParams) {
+	async txSend(options, queryParams) {
 		try {
 			await this.validate();
 			await this.validator.txSend(options);
 
-			const endpoint = '/tx/send';
+			let endpoint = '/tx/send';
 
-			const requestHeaders = {
-				'Authorization': headers.Authorization,
-				'Content-Type': headers['Content-Type'],
-				'walletID': queryParams.walletId,
+			let requestHeaders = {
+				'Authorization': this.auth.getAuthToken()
 			};
+
+			if (queryParams && queryParams.walletId){
+			  endpoint += '?walletID=' + queryParams.walletId;
+			}
 
 			const requestBody = {
-				Change_Address: options.change_Address,
-				Output_Utxo: options.output_Utxo,
+				output_Utxo: options.output_Utxo,
 			};
 
+		  // eslint-disable-next-line no-console
+			console.log(endpoint);
 			const response = await this.request.postRequest(endpoint, requestBody, requestHeaders);
 
 			if (response instanceof Error) {
 				throw response;
 			}
 
-			return response.data;
+			return response;
 		} catch (error) {
-			throw new Error('Transaction request failed: ' + error);
+			throw new Error('Pay request failed: ' + error);
 		}
 	}
 }
 
-export default Transaction;
+export default Pay;
