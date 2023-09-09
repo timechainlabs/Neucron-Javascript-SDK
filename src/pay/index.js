@@ -41,8 +41,6 @@ class Pay {
    * @return {Object} The headers of the response if successful.
    */
 	async txMultipayc(options,queryParams) {
-
-	  // TODO: test this endpoint
 		try {
 			await this.validate();
 			await this.validator.txMultipayc(options);
@@ -73,8 +71,6 @@ class Pay {
 				Outputs: options.Outputs,
 			};
 
-		  // eslint-disable-next-line no-console
-			console.log(endpoint, requestBody, requestHeaders);
 			const response = await this.request.postRequest(endpoint, requestBody, requestHeaders);
 
 			if (response instanceof Error) {
@@ -91,10 +87,10 @@ class Pay {
    * Initiates a payment channel transaction.
    *
    * @param {Object} options - The options for the payment channel transaction.
-   * @param {string} options.receiver_address - The recipient's address.
+   * @param {string} options.receiverAddress - The recipient's address.
    * @param {number} options.amount - The amount of the transaction.
    * @param {string} options.date - The date of the transaction (format: yyyy-mm-dd).
-   * @param {number} options.sequence_Num - The sequence number of the transaction.
+   * @param {number} options.sequenceNum - The sequence number of the transaction.
    * @param {string} options.time - The time of the transaction (format: hh:mm:ss).
    *
    * @throws {Error} - If the transaction fails or encounters an error.
@@ -112,22 +108,20 @@ class Pay {
 			};
 
 			const requestBody = {
-				'amount': options.amount,
-				'date': options.date,
-				'reciver_address': options.receiver_address,
-				'sequence_Num': options.sequence_Num,
-				'time': options.time,
+				amount: options.amount,
+				date: options.date,
+				reciver_address: options.receiverAddress,
+				sequence_Num: options.sequenceNum,
+				time: options.time,
 			};
 
-		  // eslint-disable-next-line no-console
-			console.log(endpoint,requestBody,requestHeaders);
 			const response = await this.request.postRequest(endpoint, requestBody, requestHeaders);
 
 			if (response instanceof Error) {
 				throw response;
 			}
 
-			return response.headers;
+			return response;
 		} catch (error) {
 			throw new Error('Pay request failed: ' + error.message);
 		}

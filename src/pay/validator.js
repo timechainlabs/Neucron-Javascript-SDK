@@ -44,8 +44,8 @@ class Validator {
 		const schema = Joi.object({
 			amount: Joi.number().integer().required(),
 			date: Joi.string().isoDate().required(),
-		  receiver_address: Joi.string().required(),
-			sequence_Num: Joi.number().integer().required(),
+		  receiverAddress: Joi.string().required(),
+			sequenceNum: Joi.number().integer().required(),
 			time: Joi.string().regex(/^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/).required(),
 		});
 
