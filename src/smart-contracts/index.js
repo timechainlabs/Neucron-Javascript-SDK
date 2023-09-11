@@ -68,7 +68,7 @@ class SmartContracts {
    * a request to the designated API endpoint to create a transaction involving multiple output types.
    *
    * @param {Object[]} options.Input - An array of input objects representing UTXO sequence pairs.
-   * @param {Object[]} options.Flag - An array of input objects representing UTXO sequence pairs.
+   * @param {Object[]} options.flag - An array of input objects representing UTXO sequence pairs.
    * @param {number} options.Input[].Sequence_Num - The sequence number of the input UTXO.
    * @param {number} options.Input[].Output_Index - The Index of the input UTXO.
    * @param {number} options.Input[].Prev_Txid - The sequence number of the input UTXO.
@@ -80,38 +80,31 @@ class SmartContracts {
    *                                           Example: 100.
    * @param {string} options.Outputs[].Asm - The script assembly (ASM) code for the output.
    *                                        Example: "OP_2 OP_2 OP_ADD OP_EQUAL".
-   * @param {string} options.Change_Address - The change address for the transaction.
-   *
-   * @param {string} headers.Authorization - The access token for authentication (Authorization header).
-   * @param {string} headers.Content-Type - The content type of the request (Content-Type header).
+   * @param {string} options.changeAddress - The change address for the transaction.
    *
    * @param {string} [queryParams.walletId] - The ID of the wallet associated with the transaction (optional).
    *
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
-  async txMultiple(options, headers,queryParams) {
+  async txMultiple(options,queryParams) {
 	try {
 	  await this.validate();
 	  await this.validator.txMultiple(options);
 
-	  const endpoint = '/tx/multiple';
+	  let endpoint = '/tx/multiple';
 
 	  let requestHeaders = {
-		'Authorization': headers.Authorization,
-		'Content-Type': headers['Content-Type'],
+		'Authorization': this.auth.getAuthToken()
 	  };
 
 	  if(queryParams && queryParams.walletId){
-		requestHeaders = {
-		  ...requestHeaders,
-		  walletId: queryParams.walletId
-		};
+		endpoint += '?walletID=' + queryParams.walletId;
 	  };
 
 	  const requestBody = {
-		Change_Address: options.Change_Address,
-		Flag: options.Flag,
+		Change_Address: options.changeAddress,
+		Flag: options.flag,
 		Input: options.Input,
 		LockTime: options.LockTime,
 		Outputs: options.Outputs,
@@ -148,9 +141,6 @@ class SmartContracts {
    *                                        Example: "OP_2 OP_2 OP_ADD OP_EQUAL".
    * @param {string} options.Change_Address - The change address for the transaction.
    *
-   * @param {string} headers.Authorization - The access token for authentication (Authorization header).
-   * @param {string} headers.Content-Type - The content type of the request (Content-Type header).
-   *
    * @param {string} queryParams.walletId - The ID of the wallet associated with the transaction.
    *
    * @throws {Error} Throws an error if the transaction request fails.
@@ -165,9 +155,7 @@ class SmartContracts {
 	  const endpoint = '/tx/sign';
 
 	  const requestHeaders = {
-		'Authorization': headers.Authorization,
-		'Content-Type': headers['Content-Type'],
-		'walletID': queryParams.walletId,
+		'Authorization': this.auth.getAuthToken()
 	  };
 
 	  const requestBody = {
@@ -194,42 +182,37 @@ class SmartContracts {
    * Unlock the funds/data of previous transaction. This function prepares and sends
    * a request to the designated API endpoint to create a transaction of unlocking previous transaction.
    *
-   * @param {string} options.UnLocking_script - unlocking script of prev transaction.
-   * @param {number} options.output_Index - output index of prev transaction which user want to unlock.
+   * @param {string} options.unlockingScript - unlocking script of prev transaction.
+   * @param {number} options.outputIndex - output index of prev transaction which user want to unlock.
    * @param {string} options.prevTxID - previous transaction id which user want to unlock.
-   * @param {string} headers.Authorization - The access token for authentication (Authorization header).
-   * @param {string} headers.Content-Type - The content type of the request (Content-Type header).
-   *
-   * @param {string} queryParams.walletId - The ID of the wallet associated with the transaction.
+   * @param {string} [queryParams.walletId] - The ID of the wallet associated with the transaction (Optional).
    *
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
-  async txUnlock(options, queryParams, headers) {
+  async txUnlock(options, queryParams) {
 	try {
-	  // TODO: Test this endpoint
+
 	  await this.validate();
 	  await this.validator.txUnlock(options);
-	  const endpoint = '/tx/sign';
+	  let endpoint = '/tx/unlock';
 
 	  let requestHeaders = {
-		'Authorization': headers.Authorization,
-		'Content-Type': headers['Content-Type'],
+		Authorization: this.auth.getAuthToken()
 	  };
 
 	  if (queryParams && queryParams.walletId) {
-		requestHeaders = {
-		  ...requestHeaders,
-		  walletID: queryParams.walletId,
-		};
+		endpoint += '?walletID=' + queryParams.walletId;
 	  }
 
 	  const requestBody = {
-		UnLocking_script: options.UnLocking_script,
-		output_Index: options.output_Index,
+		UnLocking_script: options.unlockingScript,
+		output_Index: options.outputIndex,
 		prevTxID: options.prevTxID
 	  };
 
+	  // eslint-disable-next-line no-console
+	  console.log(endpoint, requestBody, requestHeaders);
 	  const response = await this.request.postRequest(endpoint, requestBody, requestHeaders);
 
 	  if (response instanceof Error) {
@@ -238,7 +221,7 @@ class SmartContracts {
 
 	  return response;
 	} catch (error) {
-	  throw new Error('Transaction request failed: ' + error.message);
+	  throw new Error('Transaction request failed: ' + error);
 	}
   }
 

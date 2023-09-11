@@ -29,8 +29,8 @@ class Validator {
 		  Asm: Joi.string().required(),
 		}),
 	  ),
-	  Flag: Joi.string(),
-	  Change_Address: Joi.string(),
+	  flag: Joi.string(),
+	  changeAddress: Joi.string(),
 	});
 
 	await schema.validateAsync(opts);
@@ -62,9 +62,9 @@ class Validator {
 
   async txUnlock(opts) {
 	const schema = Joi.object({
-	  UnLocking_script: Joi.string().required(),
+	  unlockingScript: Joi.string().required(),
 	  prevTxID: Joi.string().required(),
-	  output_Index: Joi.number().integer().required()
+	  outputIndex: Joi.number().integer().required()
 	});
 
 	await schema.validateAsync(opts);
