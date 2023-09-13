@@ -7,6 +7,38 @@ class Validator {
    * @param {Object} options - The data for asset creation.
    * @throws {Error} Throws an error if the data is invalid.
    */
+  async transferAsset(options) {
+	const schema = Joi.object({
+	  asset_id: Joi.string().required(),
+		split_destinations: Joi.array().items(
+			Joi.object({
+			  address: Joi.string().required(),
+			  amount: Joi.number().required(),
+			})
+		  )
+	}).required();
+	await schema.validateAsync(options);
+  }
+
+  /**
+   * Validates asset creation data.
+   * @param {Object} options - The data for asset creation.
+   * @throws {Error} Throws an error if the data is invalid.
+   */
+  async transferAllAssets(options) {
+	const schema = Joi.object({
+	  holding_address: Joi.string().required(),
+	  split_destinations: Joi.array().items(
+		Joi.object({
+		  address: Joi.string().required(),
+		  amount: Joi.number().required(),
+		})
+	  ),
+	  symbol: Joi.string().required(),
+	}).required();
+	await schema.validateAsync(options);
+  }
+
   async assetData(options) {
 	const schema = Joi.object({
 	  data: Joi.object().required(),
@@ -51,6 +83,31 @@ class Validator {
 	await schema.validateAsync(options);
   }
 
+  /**
+   * return status of asset.
+   * @param {Object} options - The data for asset creation.
+   * @param {string} options.tokenId tokenId of the Asset you wanna fetch status of
+   * @throws {Error} Throws an error if the data is invalid.
+   */
+  async assetStatus(options) {
+	const schema = Joi.object({
+	  tokenId: Joi.string().required(),
+	}).required();
+	await schema.validateAsync(options);
+  }
+
+  /**
+   * get Tokens by address
+   * @param {Object} options - The data for asset creation.
+   * @param {string} options.address address of the wallet you want to fetch tokens of
+   * @throws {Error} Throws an error if the data is invalid.
+   */
+  async getTokensByAddress(options) {
+	const schema = Joi.object({
+	  address: Joi.string().required(),
+	}).required();
+	await schema.validateAsync(options);
+  }
 }
 
 export default new Validator();

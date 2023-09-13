@@ -191,6 +191,7 @@ class SmartContracts {
    * @return {Object} The headers of the response if successful.
    */
   async txUnlock(options, queryParams) {
+	// TODO: Test This Endpoint
 	try {
 
 	  await this.validate();

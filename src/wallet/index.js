@@ -22,6 +22,8 @@ class Wallet {
    * @return {Object} The headers of the response if successful.
    */
   async createWallet(options) {
+
+	//TODO: Implement these endpoints: { xPubKeys, setDefaultWallet, getMnemonic}
 	try {
 
 	  await this.validate();
