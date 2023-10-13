@@ -15,6 +15,8 @@ class Wallet {
 	}
   }
 
+  //TODO: Implement these endpoints: { xPubKeys, setDefaultWallet, getMnemonic}
+
   /**
    * Lets a user to create an wallet
    * @param {string} [options.mnemonic] - using this mnemonic user can create an wallet (optional).
@@ -23,11 +25,10 @@ class Wallet {
    */
   async createWallet(options) {
 
-	//TODO: Implement these endpoints: { xPubKeys, setDefaultWallet, getMnemonic}
 	try {
 
 	  await this.validate();
-	  const endpoint = '/v1/wallet/create';
+	  const endpoint = '/wallet/create';
 
 	  const requestBody = {};
 
@@ -41,7 +42,7 @@ class Wallet {
 	  if (response instanceof Error) {
 		throw response;
 	  }
-	  return response;
+	  return await response.data.walletID;
 	} catch (error) {
 	  throw new Error('Wallet creation failed: ' + error);
 	}
@@ -59,7 +60,7 @@ class Wallet {
 	try {
 	  await this.validate();
 
-	  const endpoint = '/v1/wallet/default';
+	  const endpoint = '/wallet/default';
 
 	  const requestBody = {};
 
@@ -84,7 +85,7 @@ class Wallet {
 	try {
 	  await this.validate();
 
-	  let endpoint = '/v1/wallet/history';
+	  let endpoint = '/wallet/history';
 
 	  let requestHeaders = {
 		Authorization: this.auth.getAuthToken()
@@ -116,7 +117,7 @@ class Wallet {
 	try {
 	  await this.validate();
 
-	  let endpoint = '/v1/wallet/balance';
+	  let endpoint = '/wallet/balance';
 
 	  if (options && options.walletId){
 
@@ -149,7 +150,7 @@ class Wallet {
 	  await this.validate();
 
 
-	  const endpoint = '/v1/wallet/address';
+	  const endpoint = '/wallet/address';
 	  let requestUrl = endpoint;
 
 		let requestHeaders = {
@@ -185,7 +186,7 @@ class Wallet {
 	  await this.validate();
 	  await this.validator.getWalletAddressByPath(query);
 
-	  const endpoint = '/v1/wallet/address/create';
+	  const endpoint = '/wallet/address/create';
 
 	  let requestHeaders = {
 		'Content-Type': headers['Content-Type'],
@@ -212,7 +213,7 @@ class Wallet {
 	try {
 	  await this.validate();
 
-	  let endpoint = '/v1/wallet/keys';
+	  let endpoint = '/wallet/keys';
 
 	  const requestHeaders = {
 		Authorization: this.auth.getAuthToken()
@@ -242,7 +243,7 @@ class Wallet {
 	try {
 	  await this.validate();
 
-	  const endpoint = '/v1/wallet/list';
+	  const endpoint = '/wallet/list';
 
 	  let requestHeaders = {
 		Authorization: this.auth.getAuthToken()
@@ -269,7 +270,7 @@ class Wallet {
 	try {
 	  await this.validate();
 
-	  let endpoint = '/v1/wallet/utxo';
+	  let endpoint = '/wallet/utxo';
 
 	  const requestHeaders = {
 		Authorization: this.auth.getAuthToken()
