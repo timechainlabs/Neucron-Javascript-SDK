@@ -27,7 +27,7 @@ class Wallet {
 	try {
 
 	  await this.validate();
-	  const endpoint = '/wallet/create';
+	  const endpoint = '/v1/wallet/create';
 
 	  const requestBody = {};
 
@@ -59,7 +59,7 @@ class Wallet {
 	try {
 	  await this.validate();
 
-	  const endpoint = '/wallet/default';
+	  const endpoint = '/v1/wallet/default';
 
 	  const requestBody = {};
 
@@ -84,7 +84,7 @@ class Wallet {
 	try {
 	  await this.validate();
 
-	  let endpoint = '/wallet/history';
+	  let endpoint = '/v1/wallet/history';
 
 	  let requestHeaders = {
 		Authorization: this.auth.getAuthToken()
@@ -116,7 +116,7 @@ class Wallet {
 	try {
 	  await this.validate();
 
-	  let endpoint = '/wallet/balance';
+	  let endpoint = '/v1/wallet/balance';
 
 	  if (options && options.walletId){
 
@@ -149,7 +149,7 @@ class Wallet {
 	  await this.validate();
 
 
-	  const endpoint = '/wallet/address';
+	  const endpoint = '/v1/wallet/address';
 	  let requestUrl = endpoint;
 
 		let requestHeaders = {
@@ -185,7 +185,7 @@ class Wallet {
 	  await this.validate();
 	  await this.validator.getWalletAddressByPath(query);
 
-	  const endpoint = '/wallet/address/create';
+	  const endpoint = '/v1/wallet/address/create';
 
 	  let requestHeaders = {
 		'Content-Type': headers['Content-Type'],
@@ -212,7 +212,7 @@ class Wallet {
 	try {
 	  await this.validate();
 
-	  let endpoint = '/wallet/keys';
+	  let endpoint = '/v1/wallet/keys';
 
 	  const requestHeaders = {
 		Authorization: this.auth.getAuthToken()
@@ -242,7 +242,7 @@ class Wallet {
 	try {
 	  await this.validate();
 
-	  const endpoint = '/wallet/list';
+	  const endpoint = '/v1/wallet/list';
 
 	  let requestHeaders = {
 		Authorization: this.auth.getAuthToken()
@@ -269,7 +269,7 @@ class Wallet {
 	try {
 	  await this.validate();
 
-	  let endpoint = '/wallet/utxo';
+	  let endpoint = '/v1/wallet/utxo';
 
 	  const requestHeaders = {
 		Authorization: this.auth.getAuthToken()
