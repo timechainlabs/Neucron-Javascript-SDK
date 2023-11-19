@@ -1,5 +1,5 @@
 const {expect} = require('chai');
-const validator = require('../src/pay/validator'); // Update the path accordingly
+const validator = require('../src/Pay/validator'); // Update the path accordingly
 const Joi = require('joi');
 
 describe('Validator', () => {
@@ -46,3 +46,33 @@ describe('Validator', () => {
     });
   });
 });
+
+// Add tests for Metanet-specific validations
+describe('Metanet', () => {
+  it('should validate options for creating a Metanet node', async () => {
+      const validMetanetOptions = {
+          // Your valid Metanet creation options here
+      };
+      try {
+          await metanetValidator.createMetanetNode(validMetanetOptions);
+      } catch (error) {
+          throw new Error('Metanet validation should not fail');
+      }
+  });
+
+  it('should throw an error for invalid Metanet options', async () => {
+      const invalidMetanetOptions = {
+          // Your invalid Metanet options here
+      };
+      try {
+          await metanetValidator.createMetanetNode(invalidMetanetOptions).then((res) => { }).catch((obj) => {
+              throw new Error('Metanet validation should fail');
+          });
+      } catch (error) {
+          expect(error).to.be.an.instanceOf(Joi.ValidationError);
+      }
+  });
+
+  // Add more Metanet-specific validation tests as needed
+});
+
