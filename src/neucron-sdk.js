@@ -4,8 +4,6 @@ import Wallet from './wallet/index.js';
 import SmartContracts from './smart-contracts/index.js';
 import DataIntegrity from './data-integrity/index.js';
 import Asset from './asset/index.js';
-import Metanet from './metanet/index.js'; 
-import MetanetAPI from './metanet/index.js';
 
 class NeucronSDK {
 	constructor(config) {
@@ -15,8 +13,6 @@ class NeucronSDK {
 		this.smartContracts = new SmartContracts(this.authentication);
 		this.dataIntegrity = new DataIntegrity(this.authentication);
 		this.asset = new Asset(this.authentication);
-		this.metanet = new MetanetAPI(this.authentication);
-		
 	}
 }
 

@@ -52,8 +52,6 @@ class Asset {
 	}
   }
 
-
-
   /**
    * return list of assets
    * @throws {Error} Throws an error if the transaction request fails.
@@ -252,41 +250,6 @@ class Asset {
 	  throw new Error('Asset processing failed: ' + error.message);
 	}
   }
-
-  /**
- * Register a new asset on the Neucron platform.
- * @param {Object} assetData - The data for the asset registration.
- * @throws {Error} Throws an error if the registration request fails.
- * @return {Object} The response data if successful.
- */
-async registerAsset(assetData) {
-	try {
-	  // Perform authentication and data validation as needed
-	  await this.validate();
-	  await this.validator.assetData(assetData);
-  
-	  // Define the endpoint for the registration request
-	  let endpoint = '/asset/register';
-  
-	  // Set up request headers with the authentication token
-	  const requestHeaders = {
-		Authorization: this.auth.getAuthToken(),
-	  };
-  
-	  // Make the HTTP POST request
-	  const response = await this.request.postRequest(endpoint, assetData, requestHeaders);
-  
-	  if (response instanceof Error) {
-		throw response;
-	  }
-  
-	  // Return the response data
-	  return response.data;
-	} catch (error) {
-	  throw new Error('Asset registration request failed: ' + error.message);
-	}
-  }
-  
 }
 
 export default Asset;
