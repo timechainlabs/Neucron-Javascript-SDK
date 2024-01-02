@@ -82,6 +82,45 @@ class Request {
 			return error;
 		}
 	}
+	async getMetanetNode(nodeTxID, headers) {
+        try {
+            let url = baseURL + '/metanet/getNodeInfo';
+            const response = await axios.post(url, { nodeTxID }, {
+                headers: {
+                    ...headers,
+                    ...this.globalHeaders
+                },
+            });
+            return this.handleResponse(response);
+        } catch (error) {
+            throw new Error('Get Metanet node failed: ' + error);
+        }
+    }
+
+    async deleteMetanetNode(nodeTxID, headers) {
+        try {
+            let url = baseURL + '/metanet/deleteNode';
+            const response = await axios.post(url, { nodeTxID }, {
+                headers: {
+                    ...headers,
+                    ...this.globalHeaders
+                },
+            });
+            return this.handleResponse(response);
+        } catch (error) {
+            throw new Error('Delete Metanet node failed: ' + error);
+        }
+    }
+
+    handleResponse(response) {
+        if (response.status < 400) {
+            return response.data;
+        } else {
+            const error = new Error();
+            error.info = response.data;
+            throw error;
+        }
+    }
 }
 
 export default Request;
