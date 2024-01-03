@@ -3,7 +3,11 @@
   "name": "@neucron/sdk",
   "version": "0.0.1",
   "description": "The official Neucron javascript SDK",
-  "main": "index.js",
+  "exports": {
+    ".": {
+      "import": "./index.js"
+    }
+  },
   "scripts": {
     "test": "mocha test/*.test.js && exit 0",
     "lint": "eslint",
@@ -13,14 +17,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Rookie768/timechainlabs-neucron-sdk.git"
+    "url": "git+https://github.com/timechainlabs/Neucron-Javascript-SDK.git"
   },
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Rookie768/timechainlabs-neucron-sdk/issues"
+    "url": "https://github.com/timechainlabs/Neucron-Javascript-SDK.git/issues"
   },
-  "homepage": "https://github.com/Rookie768/timechainlabs-neucron-sdk#readme",
+  "homepage": "https://github.com/timechainlabs/Neucron-Javascript-SDK.git#readme",
   "dependencies": {
     "axios": "^0.22.0",
     "browserify": "^17.0.0",
