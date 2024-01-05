@@ -35,7 +35,6 @@ class DataIntegrity {
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
-  // TODO: test this endpoint
   async txFile(options, headers, queryParams) {
 
 	try {

@@ -4,6 +4,10 @@ import Wallet from './wallet/index.js';
 import SmartContracts from './smart-contracts/index.js';
 import DataIntegrity from './data-integrity/index.js';
 import Asset from './asset/index.js';
+import Team from './team/index.js';
+import Assetyzer from './assetyzer/index.js';
+import Paymail from './paymail/index.js';
+import DigitalSignature from './digital-signature/index.js'
 
 class NeucronSDK {
 	constructor(config) {
@@ -13,6 +17,10 @@ class NeucronSDK {
 		this.smartContracts = new SmartContracts(this.authentication);
 		this.dataIntegrity = new DataIntegrity(this.authentication);
 		this.asset = new Asset(this.authentication);
+		this.team = new Team(this.authentication);
+		this.assetyzer = new Assetyzer(this.authentication);
+		this.paymail = new Paymail(this.authentication);
+		this.digitalsignature = new DigitalSignature(this.authentication);
 	}
 }
 

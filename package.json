@@ -3,11 +3,7 @@
   "name": "@neucron/sdk",
   "version": "0.0.1",
   "description": "The official Neucron javascript SDK",
-  "exports": {
-    ".": {
-      "import": "./index.js"
-    }
-  },
+  "main": "index.js",
   "scripts": {
     "test": "mocha test/*.test.js && exit 0",
     "lint": "eslint",
