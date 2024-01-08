@@ -14,13 +14,14 @@ class Assetyzer {
   }
 
   /**
-   * Creates an Assetyzer on the Neucron platform.
+   * Register an Asset on the Neucron platform.
    * @param {Object} options - The data for the Assetyzer creation.
-   * @param {string} assetType - The type of the asset.
+   * @param {string} options.assetType - The type of the asset.
+   * @param {string} [options.walletId] - The type of the asset.
    * @throws {Error} Throws an error if the request fails.
    * @return {Object} The response data if successful.
    */
-  async createAsset(options,queryParams) {
+  async register(options) {
 
 	await this.validate();
 
@@ -31,8 +32,12 @@ class Assetyzer {
 		Authorization: this.auth.getAuthToken()
 	  };
 
-	  if (queryParams && queryParams.assetType){
-		endpoint += '?assetType=' + queryParams.assetType;
+	  endpoint += '?assetType=' + options.assetType;
+	  delete options.assetType
+
+	  if (options && options.walletId){
+		endpoint += '&walletID=' + options.walletId;
+		delete options.walletId
 	  }
 
 	  const response = await this.request.postRequest(endpoint,options,requestHeaders);
@@ -63,9 +68,13 @@ class Assetyzer {
 	  const requestHeaders = {
 		Authorization: this.auth.getAuthToken()
 	  };
+		
+	  endpoint += '?assetID=' + options.assetId;
+	  delete options.assetId
 
-	  if (options && options.assetId){
-		endpoint += '?assetID=' + options.assetId;
+	  if (options && options.walletId){
+		endpoint += '&walletID=' + queryParams.walletId;
+		delete options.walletId
 	  }
 
 	  const response = await this.request.postRequest(endpoint,options,requestHeaders);
@@ -80,39 +89,14 @@ class Assetyzer {
 	}
   }
 
-  /**
-   * return list of Assets
-   * @throws {Error} Throws an error if the transaction request fails.
-   * @return {Object} The headers of the response if successful.
-   */
-  async getAllAssets() {
-	try {
-	  await this.validate();
-
-	  const endpoint = '/asset/assetlist';
-
-	  let requestHeaders = {
-		Authorization: this.auth.getAuthToken()
-	  };
-
-	  const response = await this.request.getRequest(endpoint, requestHeaders);
-
-	  if (response instanceof Error) {
-		throw response;
-	  }
-	  return response.data;
-	} catch (error) {
-	  throw new Error('Unable to fetch wallet Ids : ' + error);
-	}
-  }
 
   /**
    * deploy asset on chain
-   * @param {string} options.assetId assetId of Asset you want to deploy.
+   * @param {string} assetId assetId of Asset you want to deploy.
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
-  async deploy(options) {
+  async deploy(assetId) {
 	try {
 
 	  await this.validate();
@@ -122,11 +106,8 @@ class Assetyzer {
 		Authorization: this.auth.getAuthToken()
 	  };
 
-	  if (options && options.assetId){
-		endpoint += '?assetID=' + options.assetId;
-	  }
+	  endpoint += '?assetID=' + assetId;
 
-      console.log(endpoint, requestHeaders);
 	  const response = await this.request.getRequest(endpoint, requestHeaders);
 
 	  if (response instanceof Error) {
@@ -138,62 +119,25 @@ class Assetyzer {
 	}
   }
 
-
-    /**
-   * get asset detail by id
-   * @param {string} options.assetId assetId of Asset you want to get detail of.
-   * @throws {Error} Throws an error if the transaction request fails.
-   * @return {Object} The headers of the response if successful.
-   */
-    async getAssetDetailById(options) {
-        try {
-    
-          await this.validate();
-          let endpoint = '/asset/detail';
-    
-          let requestHeaders = {
-            Authorization: this.auth.getAuthToken()
-          };
-    
-          if (options && options.assetId){
-            endpoint += '?assetID=' + options.assetId;
-          }
-
-          const response = await this.request.getRequest(endpoint, requestHeaders);
-    
-          if (response instanceof Error) {
-            throw response;
-          }
-          return response;
-        } catch (error) {
-          throw new Error('Unable to fetch Assetyzer Status : ' + error);
-        }
-      }
-    
-
   /**
-   * get Tokens by address
-   * @param {string} options.address  address of wallet you want to fetch tokens of
+   * get asset detail by id
+   * @param {string} assetId assetId of Asset you want to get detail of.
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
-  async getTokensByAddress(options) {
+ async getAssetDetailById(assetId) {
 	try {
 
 	  await this.validate();
-	  await this.validator.getTokensByAddress(options);
-	  let endpoint = '/Assetyzer/tokens';
+	  let endpoint = '/asset/detail';
 
 	  let requestHeaders = {
 		Authorization: this.auth.getAuthToken()
 	  };
 
-	  if (options && options.address){
-		endpoint += '?address=' + options.address;
-	  }
 
-	  // eslint-disable-next-line no-console
-	  console.log(endpoint, requestHeaders);
+	  endpoint += '?assetID=' + assetId;
+
 	  const response = await this.request.getRequest(endpoint, requestHeaders);
 
 	  if (response instanceof Error) {
@@ -201,32 +145,34 @@ class Assetyzer {
 	  }
 	  return response;
 	} catch (error) {
-	  throw new Error('Unable to fetch Tokens from this address : ' + error);
+	  throw new Error('Unable to fetch Assetyzer Status : ' + error);
 	}
-  }
+ }
 
-  /**
-   * get Tokens by walletId
-   * @param {string} [options.walletId]  walletId they belong to if no walletId is provided then it will default walletId
+ /**
+   * get asset detail by id
+   * @param {string} assetId assetId of Asset you want to get detail of.
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
-  async getTokensByWalletId(options) {
+ async recall(assetId, holderPaymail, options) {
 	try {
 
 	  await this.validate();
-	  let endpoint = '/Assetyzer/tokens/list';
+	  let endpoint = '/asset/detail';
 
 	  let requestHeaders = {
 		Authorization: this.auth.getAuthToken()
 	  };
+
+
+	  endpoint += '?assetID=' + assetId + '&' + 'holderPaymail=' + holderPaymail;
 
 	  if (options && options.walletId){
-		endpoint += '?walletID=' + options.walletId;
+		endpoint += '&walletID=' + queryParams.walletId;
+		delete options.walletId
 	  }
 
-	  // eslint-disable-next-line no-console
-	  console.log(endpoint, requestHeaders);
 	  const response = await this.request.getRequest(endpoint, requestHeaders);
 
 	  if (response instanceof Error) {
@@ -234,81 +180,9 @@ class Assetyzer {
 	  }
 	  return response;
 	} catch (error) {
-	  throw new Error('Unable to process you request at this moment : ' + error);
+	  throw new Error('Unable to fetch Assetyzer Status : ' + error);
 	}
-  }
-
-  /**
-   * Transfer Assetyzer .
-   * @param {Object} options - The data for the Assetyzer creation.
-   * @param {string} [queryParams.walletId] - The data for the Assetyzer creation (Optional).
-   * @throws {Error} Throws an error if the request fails.
-   * @return {Object} The response data if successful.
-   */
-  async transferAssetyzer( options,queryParams) {
-
-	await this.validate();
-	await this.validator.transferAssetyzer(options);
-
-	// TODO: test this endpoint
-
-	try {
-	  let endpoint = '/Assetyzer/transfer';
-
-	  const requestHeaders = {
-		Authorization: this.auth.getAuthToken()
-	  };
-
-	  if (queryParams && queryParams.walletId){
-		endpoint += '?walletID=' + queryParams.walletId;
-	  }
-
-	  const response = await this.request.postRequest(endpoint,options,requestHeaders);
-
-	  if (response instanceof Error) {
-		throw response;
-	  }
-
-	  return response;
-	} catch (error) {
-	  throw new Error('Assetyzer creation request failed: ' + error.message);
-	}
-  }
-
-  /**
-   * Transfer All Assetyzers .
-   * @param {Object} options - The data for the Assetyzer creation.
-   * @param {string} [queryParams.walletId] - The data for the Assetyzer creation (Optional).
-   * @throws {Error} Throws an error if the request fails.
-   * @return {Object} The response data if successful.
-   */
-  async transferAllAssetyzers( options,queryParams) {
-	// TODO: test this endpoint
-	await this.validate();
-	await this.validator.transferAllAssetyzers(options);
-
-	try {
-	  let endpoint = '/Assetyzer/transfer/address';
-
-	  const requestHeaders = {
-		Authorization: this.auth.getAuthToken()
-	  };
-
-	  if (queryParams && queryParams.walletId){
-		endpoint += '?walletID=' + queryParams.walletId;
-	  }
-
-	  const response = await this.request.postRequest(endpoint,options,requestHeaders);
-
-	  if (response instanceof Error) {
-		throw response;
-	  }
-
-	  return response;
-	} catch (error) {
-	  throw new Error('Assetyzer processing failed: ' + error.message);
-	}
-  }
+ }
 }
 
 export default Assetyzer;

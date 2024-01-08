@@ -179,10 +179,9 @@ class Stas {
 
 	  if (options && options.walletId){
 		endpoint += '?walletID=' + options.walletId;
+		delete options.walletId
 	  }
 
-	  // eslint-disable-next-line no-console
-	  console.log(endpoint, requestHeaders);
 	  const response = await this.request.getRequest(endpoint, requestHeaders);
 
 	  if (response instanceof Error) {
@@ -212,10 +211,9 @@ class Stas {
 
 	  if (options && options.walletId){
 		endpoint += '?walletID=' + options.walletId;
+		delete options.walletId
 	  }
 
-	  // eslint-disable-next-line no-console
-	  console.log(endpoint, requestHeaders);
 	  const response = await this.request.getRequest(endpoint, requestHeaders);
 
 	  if (response instanceof Error) {
@@ -282,6 +280,7 @@ class Stas {
 
 	  if (options && options.walletId){
 		endpoint += '?walletID=' + options.walletId;
+		delete options.walletId
 	  }
 
 	  const response = await this.request.postRequest(endpoint,options,requestHeaders);
