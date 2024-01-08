@@ -23,29 +23,24 @@ class DigitalSignature {
  async signature(options) {
 	try {
 	  await this.validate();
-  
-	  // Define the API endpoint
+
 	  const endpoint = '/tx/mesign';
-  
-	  // Prepare the request body
+
 	  const requestBody = {
         message: options.message
       };
-  
-	  // Adjust requestHeaders to include PaymailName in query parameters
+
 	  const requestHeaders = {
 		Authorization: this.auth.getAuthToken(),
 	  };
   
-	  // Make the POST request to create the Paymail
 	  const response = await this.request.postRequest(endpoint, requestBody, requestHeaders);
   
-	  // Handle errors, if any
+
 	  if (response instanceof Error) {
 		throw response;
 	  }
   
-	  // Return the Paymail ID from the response data
 	  return await response;
 	} catch (error) {
 	  throw new Error('Paymail creation failed: ' + error);
@@ -65,30 +60,24 @@ class DigitalSignature {
 	try {
 	  await this.validate();
   
-	  // Define the API endpoint
 	  const endpoint = '/tx/meverify';
   
-	  // Prepare the request body
 	  const requestBody = {
         message: options.message,
         public_Key: options.public_Key,
         signature_hex: options.signature_hex
       };
   
-	  // Adjust requestHeaders to include PaymailName in query parameters
 	  const requestHeaders = {
 		Authorization: this.auth.getAuthToken(),
 	  };
   
-	  // Make the POST request to create the Paymail
 	  const response = await this.request.postRequest(endpoint, requestBody, requestHeaders);
   
-	  // Handle errors, if any
 	  if (response instanceof Error) {
 		throw response;
 	  }
   
-	  // Return the Paymail ID from the response data
 	  return await response;
 	} catch (error) {
 	  throw new Error('Verification failed: ' + error);
