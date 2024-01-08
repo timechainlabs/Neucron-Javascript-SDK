@@ -1,15 +1,19 @@
 {
   "type": "module",
   "name": "@neucron/sdk",
-  "version": "0.0.1",
-  "description": "The official Neucron javascript SDK",
-  "main": "index.js",
+  "version": "0.1.0",
+  "description": "The official Neucron JavaScript SDK",
+  "exports": {
+    ".": "./dist/neucron-sdk.js",
+    "./src/neucron-sdk": "./src/neucron-sdk.js"
+  },
+  "main": "dist/neucron-sdk.js",
   "scripts": {
     "test": "mocha test/*.test.js && exit 0",
-    "lint": "eslint",
-    "build": "npm run make:dir && npm run browserify",
-    "browserify": "browserify index.js --standalone NeucronSDK > dist/neucron-sdk.js",
-    "make:dir": "mkdir -p dist"
+    "lint": "eslint .",
+    "build": "npm run make:dir && npm run babel",
+    "make:dir": "mkdir -p dist",
+    "babel": "babel src -d dist --copy-files"
   },
   "repository": {
     "type": "git",
@@ -23,10 +27,13 @@
   "homepage": "https://github.com/timechainlabs/Neucron-Javascript-SDK.git#readme",
   "dependencies": {
     "axios": "^0.22.0",
-    "browserify": "^17.0.0",
     "joi": "^17.4.2"
   },
   "devDependencies": {
+    "@babel/cli": "^7.17.0",
+    "@babel/core": "^7.17.2",
+    "@babel/preset-env": "^7.17.1",
+    "babel-eslint": "^10.1.0",
     "chai": "^4.3.4",
     "eslint": "^8.48.0",
     "eslint-plugin-import": "^2.28.1",

@@ -2,8 +2,6 @@ import Request from '../request.js';
 
 class Assetyzer {
 
-  // TODO: implement these endpoints {RegisterAssetyzer, ConsolidatedEndpoint}
-
   constructor(auth) {
 	this.auth = auth;
 	this.request = new Request();

@@ -3,8 +3,6 @@ import validator from './validator.js';
 
 class Asset {
 
-  // TODO: implement these endpoints {RegisterAsset, ConsolidatedEndpoint}
-
   constructor(auth) {
 	this.auth = auth;
 	this.validator = validator;
