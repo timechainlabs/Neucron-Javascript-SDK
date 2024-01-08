@@ -13,7 +13,6 @@ class Team {
 	}
   }
 
-  //TODO: Implement these endpoints: { xPubKeys, setDefaultTeam, getMnemonic}
 
   /**
    * Lets a user create team with email, team_name and team_desc.
@@ -78,13 +77,9 @@ class Team {
    */
   async updateTeamKyb(options) {
     try {
-      // Validate the SDK state
+
       await this.validate();
-  
-    //   // Ensure the walletName is provided
-    //   if (!options.name && !options.desc) {
-    //     throw new Error('Team name , Team desc  is required for team updation.');
-    //   }
+
 
       const endpoint = '/team/kyb';
   
@@ -105,15 +100,13 @@ class Team {
       };
 
       const requestUrl = endpoint + '?' + 'teamID=' + options.teamId;
-      // Make the POST request to create the wallet
+
       const response = await this.request.postRequest(requestUrl, requestBody, requestHeaders);
   
-      // Handle errors, if any
       if (response instanceof Error) {
         throw response;
       }
   
-      // Return the wallet ID from the response data
       return await response;
     } catch (error) {
       throw new Error('Wallet creation failed: ' + error);
@@ -147,81 +140,7 @@ class Team {
           throw new Error('Authentication request failed: ' + error);
         }
       }
-
-    /**
-   * Lets a user update team with  name and desc.
-   * @param {string} options.desc - team_desc of team.
-   * @param {string} options.name - team_name of team.
-   * @throws {Error} Throws an error if the transaction request fails.
-   * @return {Object} The headers of the response if successful.
-   */
-    async updateTeam(options) {
-        try {
-          // Validate the SDK state
-          await this.validate();
-      
-          // Ensure the walletName is provided
-          if (!options.name && !options.desc) {
-            throw new Error('Team name , Team desc  is required for team updation.');
-          }
-    
-          const endpoint = '/team';
-      
-          const requestBody = {
-            "email": options.email,
-            "team_desc": options.team_desc,
-            "team_name": options.team_name
-          };
-      
-          const requestHeaders = {
-            Authorization: this.auth.getAuthToken(),
-          };
-    
-      
-          // Make the POST request to create the wallet
-          const response = await this.request.postRequest(endpoint, requestBody, requestHeaders);
-      
-          // Handle errors, if any
-          if (response instanceof Error) {
-            throw response;
-          }
-      
-          // Return the wallet ID from the response data
-          return await response;
-        } catch (error) {
-          throw new Error('Wallet creation failed: ' + error);
-        }
-      }
   
-
-  /**
-   * Lets a user to get Team Detail
-   * @param {string} [options.teamId] .
-   * @throws {Error} Throws an error if the transaction request fails.
-   * @return {Object} The headers of the response if successful.
-   */
-  async getTeamDetail(options) {
-
-	try {
-	  await this.validate();
-
-	  const endpoint = '/team';
-      const requestHeaders = {
-		Authorization: this.auth.getAuthToken()
-	  };
-
-      const requestUrl = endpoint + '?' + 'teamID=' + options.teamId;
-      console.log(requestUrl, endpoint )
-	  const response = await this.request.getRequest(endpoint, requestHeaders);
-
-	  if (response instanceof Error) {
-		throw response;
-	  }
-	  return response;
-	} catch (error) {
-	  throw new Error('Authentication request failed: ' + error);
-	}
-  }
 
     /**
    * Lets a user to get Team List
@@ -249,221 +168,6 @@ class Team {
         }
       }
 
-  /**
-   * get transaction history of corresponding TeamId if not passed then default Team transaction history will return
-   * @param {string} [options.TeamId] - using this mnemonic user can create an Team (optional).
-   * @throws {Error} Throws an error if the transaction request fails.
-   * @return {Object} The headers of the response if successful.
-   */
-  async getTeamHistory(options) {
-	try {
-	  await this.validate();
-
-	  let endpoint = '/Team/history';
-
-	  let requestHeaders = {
-		Authorization: this.auth.getAuthToken()
-	  };
-
-	  if (options && options.TeamId){
-
-		endpoint += `?TeamID=${options.TeamId}`;
-	  }
-
-	  const response = await this.request.getRequest(endpoint, requestHeaders);
-
-	  if (response instanceof Error) {
-		throw response;
-	  }
-	  return response.data.history;
-	} catch (error) {
-	  throw new Error('Unable to fetch transaction history: ' + error);
-	}
-  }
-
-  /**
-   * get Team balance if Team is not passed then default Team balance will be returned
-   * @param {string} [options.TeamId] - using this mnemonic user can create an Team (optional).
-   * @throws {Error} Throws an error if the transaction request fails.
-   * @return {Object} The headers of the response if successful.
-   */
-  async getTeamBalance(options) {
-	try {
-	  await this.validate();
-
-	  let endpoint = '/Team/balance';
-
-	  if (options && options.TeamId){
-
-		endpoint += `?TeamID=${options.TeamId}`;
-	  }
-
-	  const requestHeaders = {
-		Authorization: this.auth.getAuthToken()
-	  };
-
-	  const response = await this.request.getRequest(endpoint, requestHeaders);
-	  if (response instanceof Error) {
-		throw response;
-	  }
-
-	  return response;
-	} catch (error) {
-	  throw new Error('Processing failed: ' + error);
-	}
-  }
-
-  /**
-   * get Team addresses if Team is not passed then default Team addresses will be returned
-   * @param {string} [options.TeamId] - using this mnemonic user can create an Team (optional).
-   * @throws {Error} Throws an error if the transaction request fails.
-   * @return {Object} The headers of the response if successful.
-   */
-  async getAddressesByTeamId(options) {
-	try {
-	  await this.validate();
-
-
-	  const endpoint = '/Team/address';
-	  let requestUrl = endpoint;
-
-		let requestHeaders = {
-		Authorization: this.auth.getAuthToken()
-	  };
-
-	  if (options && options.TeamId){
-		requestUrl += `?TeamID=${options.TeamId}`;
-	  }
-
-	  const response = await this.request.getRequest(requestUrl, requestHeaders);
-	  if (response instanceof Error) {
-		throw response;
-	  }
-
-	  return response;
-	} catch (error) {
-	  throw new Error('Processing failed: ' + error);
-	}
-  }
-
-  /**
-   * recover Team address using path of that address if Team id is not passed then it will take default TeamId
-   * @param {string} [query.TeamId] - Team Id (optional).
-   * @param {string} query.path - path of that address you want to recover (optional).
-   * @param {string} headers.Content-Type - The content type of the request (Content-Type header).
-   * @throws {Error} Throws an error if the transaction request fails.
-   * @return {Object} The headers of the response if successful.
-   */
-  async getTeamAddressByPath(headers,query) {
-	// TODO: R&D Pending in Neucron
-	try {
-	  await this.validate();
-	  await this.validator.getTeamAddressByPath(query);
-
-	  const endpoint = '/Team/address/create';
-
-	  let requestHeaders = {
-		'Content-Type': headers['Content-Type'],
-	  };
-
-	  const response = await this.request.getRequest(endpoint, requestHeaders, query);
-	  if (response instanceof Error) {
-		throw response;
-	  }
-
-	  return response;
-	} catch (error) {
-	  throw new Error('Processing failed: ' + error);
-	}
-  }
-
-  /**
-   * get keys of corresponding TeamId if not passed then default Team keys will return
-   * @param {string} [options.TeamId] - TeamId of the user he want to run options on.
-   * @throws {Error} Throws an error if the transaction request fails.
-   * @return {Object} The headers of the response if successful.
-   */
-  async getTeamKeys(options) {
-	try {
-	  await this.validate();
-
-	  let endpoint = '/Team/keys';
-
-	  const requestHeaders = {
-		Authorization: this.auth.getAuthToken()
-	  };
-
-	  if (options && options.TeamId){
-		endpoint += `?TeamID=${options.TeamId}`;
-	  }
-
-	  const response = await this.request.getRequest(endpoint, requestHeaders);
-
-	  if (response instanceof Error) {
-		throw response;
-	  }
-	  return response.data.keys;
-	} catch (error) {
-	  throw new Error('Unable to fetch keys : ' + error);
-	}
-  }
-
-  /**
-   * return list of Teams
-   * @throws {Error} Throws an error if the transaction request fails.
-   * @return {Object} The headers of the response if successful.
-   */
-  async getAllTeam() {
-	try {
-	  await this.validate();
-
-	  const endpoint = '/Team/list';
-
-	  let requestHeaders = {
-		Authorization: this.auth.getAuthToken()
-	  };
-
-	  const response = await this.request.getRequest(endpoint, requestHeaders);
-
-	  if (response instanceof Error) {
-		throw response;
-	  }
-	  return response.data.details.Teams;
-	} catch (error) {
-	  throw new Error('Unable to fetch Team Ids : ' + error);
-	}
-  }
-
-  /**
-   * return list of utxos
-   * @param {string} [options.TeamId] - TeamId of the user he want to run options on if not present then all utxos will return of user.
-   * @throws {Error} Throws an error if the transaction request fails.
-   * @return {Object} The headers of the response if successful.
-   */
-  async getAllUtxos(options) {
-	try {
-	  await this.validate();
-
-	  let endpoint = '/Team/utxo';
-
-	  const requestHeaders = {
-		Authorization: this.auth.getAuthToken()
-	  };
-
-	  if (options && options.TeamId){
-		endpoint += `?TeamID=${options.TeamId}`;
-	  }
-
-	  const response = await this.request.getRequest(endpoint, requestHeaders);
-
-	  if (response instanceof Error) {
-		throw response;
-	  }
-	  return response.data.list;
-	} catch (error) {
-	  throw new Error('Unable to fetch keys : ' + error);
-	}
-  }
 }
 
 export default Team;
