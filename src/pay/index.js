@@ -172,6 +172,50 @@ class Pay {
 			throw new Error('Pay request failed: ' + error);
 		}
 	}
+
+		/**
+   * Initiates a transaction for sending cryptocurrency to multiple output addresses.
+   *
+   * @param {{outputs: [{amount: number, address: string, note: string}]}} options - Options for configuring the transaction.
+   * @param {Object[]} options.output - An array of output objects representing recipient addresses and amounts.
+   * @param {string} options.outputs.address - The recipient's address.
+   * @param {number} options.outputs.amount - The amount of cryptocurrency to be sent, in integer units.
+   * @param {string} options.outputs.note - Note. 
+   * @param {string} [queryParams.changeAddress] - The change address for the transaction (Optional).
+   * @param {string} [queryParams.walletId] - The ID of the wallet associated with the transaction (Optional).
+   *
+   * @throws {Error} Throws an error if the transaction request fails.
+   * @return {Object} The headers of the response if successful.
+   */
+		async txSpend(options, queryParams) {
+			try {
+				await this.validate();
+	
+				let endpoint = '/tx/spend';
+	
+				let requestHeaders = {
+					'Authorization': this.auth.getAuthToken()
+				};
+	
+				if (queryParams && queryParams.walletId){
+				  endpoint += '?walletID=' + queryParams.walletId;
+				}
+	
+				const requestBody = {
+					outputs: options.outputs,
+				};
+
+				const response = await this.request.postRequest(endpoint, requestBody, requestHeaders);
+	
+				if (response instanceof Error) {
+					throw response;
+				}
+	
+				return response;
+			} catch (error) {
+				throw new Error('Pay request failed: ' + error);
+			}
+		}
 }
 
 export default Pay;

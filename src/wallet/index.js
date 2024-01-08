@@ -17,36 +17,54 @@ class Wallet {
 
   //TODO: Implement these endpoints: { xPubKeys, setDefaultWallet, getMnemonic}
 
-  /**
-   * Lets a user to create an wallet
-   * @param {string} [options.mnemonic] - using this mnemonic user can create an wallet (optional).
-   * @throws {Error} Throws an error if the transaction request fails.
-   * @return {Object} The headers of the response if successful.
-   */
-  async createWallet(options) {
-
+/**
+ * Creates a new wallet for a user.
+ * @param {Object} options - The options for wallet creation.
+ * @param {string} options.walletName - The name of the wallet to be created.
+ * @param {string} [options.mnemonic] - The mnemonic to be used for wallet creation (optional).
+ * @throws {Error} Throws an error if the wallet creation request fails.
+ * @return {string} The wallet ID if creation is successful.
+ */
+async createWallet(options) {
 	try {
-
+	  // Validate the SDK state
 	  await this.validate();
+  
+	  // Ensure the walletName is provided
+	  if (!options.walletName) {
+		throw new Error('Wallet name is required for wallet creation.');
+	  }
+  
+	  // Define the API endpoint
 	  const endpoint = '/wallet/create';
-
+  
+	  // Prepare the request body
 	  const requestBody = {};
-
+  
+	  // Adjust requestHeaders to include walletName in query parameters
 	  const requestHeaders = {
-		...options,
-		Authorization: this.auth.getAuthToken()
+		Authorization: this.auth.getAuthToken(),
 	  };
-
-	  const response = await this.request.postRequest(endpoint, requestBody, requestHeaders);
-
+  
+	  // Append walletName to the query parameters
+	  const queryString = `walletName=${encodeURIComponent(options.walletName)}`;
+	  const requestUrl = `${endpoint}?${queryString}`;
+  
+	  // Make the POST request to create the wallet
+	  const response = await this.request.postRequest(requestUrl, requestBody, requestHeaders);
+  
+	  // Handle errors, if any
 	  if (response instanceof Error) {
 		throw response;
 	  }
-	  return await response.data.walletID;
+  
+	  // Return the wallet ID from the response data
+	  return await response;
 	} catch (error) {
 	  throw new Error('Wallet creation failed: ' + error);
 	}
   }
+  
 
   /**
    * Lets a user to set default wallet

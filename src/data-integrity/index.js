@@ -1,63 +1,49 @@
 import Request from '../request.js';
-import validator from './validator.js';
 
 class DataIntegrity {
-  constructor(auth) {
-	this.auth = auth;
-	this.validator = validator;
-	this.request = new Request();
-  }
-
-  setAuthToken(token) {
-	this.authToken = token;
-  }
-
-  getAuthToken() {
-	return this.authToken;
-  }
-
-  async validate() {
-	if (!this.auth.authToken) {
-	  throw new Error('You must logged In. Try calling auth() method first');
-	}
-  }
+    constructor(auth) {
+		this.auth = auth;
+		this.request = new Request();
+	  }
+	
+	  async validate() {
+		if (!this.auth.getAuthToken()) {
+		  throw new Error('You must logged In. Try calling auth() method first');
+		}
+	  }
 
 
   /**
    * Function to Upload File on Blockchain [Bitcom]
    *
    * @param {formData} options.upfile - file to upload on blockchain.
-   * @param {string} headers.Authorization - The access token for authentication (Authorization header).
-   * @param {string} headers.ContentType - The content type of the request (Content-Type header).
-   *
-   * @param {string} queryParams.walletId - The ID of the wallet associated with the transaction.
+   * @param {string} options.walletId - The ID of the wallet associated with the transaction.
    *
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
-  // TODO: test this endpoint
-  async txFile(options, headers, queryParams) {
+  async txFile(options) {
 
 	try {
 
 	  await this.validate();
 
-	  await this.validator.txFile(options);
-
-	  const url = '/tx/file';
+	  let url = '/tx/file';
 
 	  let requestHeaders = {
-		'Authorization': headers.Authorization,
-		'Content-Type': headers['Content-Type'],
+		'Authorization': this.auth.getAuthToken(),
+		'accept': 'application/json',
+		'Content-Type': 'multipart/form-data',
 	  };
 
-	  if (queryParams && queryParams.walletId) {
-		requestHeaders = {
-		  ...requestHeaders,
-		  walletId: queryParams.walletId,
-		};
-	  }
-	  ;
+	  const formData = options.upfile;
+
+
+	  if (options && options.walletId) {
+		url = url + '?walletID=' + options.walletId
+	  };
+
+	  console.log(url, options, requestHeaders);
 
 	  const response = await this.request.postRequest(url, options, requestHeaders);
 	  if (response instanceof Error) {
@@ -73,36 +59,28 @@ class DataIntegrity {
    * Function to sign message using one of your private key this will return signature and public key
    *
    * @param {string} options.message - message to be sign.
-   * @param {string} headers.Authorization - The access token for authentication (Authorization header).
-   * @param {string} headers.ContentType - The content type of the request (Content-Type header).
-   *
-   * @param {string} queryParams.walletId - The ID of the wallet associated with the transaction.
+   * @param {string} options.walletId - The ID of the wallet associated with the transaction.
    *
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
-  async txMessageSign(options, headers, queryParams) {
+  async txMessageSign(options) {
 
 	try {
 
 	  await this.validate();
 
-	  await this.validator.txMeSign(options);
-
 	  const url = '/tx/mesign';
 
 	  let requestHeaders = {
-		'Authorization': headers.Authorization,
-		'Content-Type': headers['Content-Type'],
+		'Authorization': this.auth.getAuthToken(),
+		'accept': 'application/json'
 	  };
 
-	  if (queryParams && queryParams.walletId) {
-		requestHeaders = {
-		  ...requestHeaders,
-		  walletId: queryParams.walletId,
-		};
-	  }
-	  ;
+	  if (options && options.walletId) {
+		url = url + '?walletID=' + options.walletId
+		delete options.walletId
+	  };
 
 	  const response = await this.request.postRequest(url, options, requestHeaders);
 	  if (response instanceof Error) {
@@ -118,26 +96,26 @@ class DataIntegrity {
    * Function to post data on blockchain
    *
    * @param {string} options.message - message to post on blockchain.
-   * @param {string} queryParams.walletId - The ID of the wallet associated with the transaction.
+   * @param {string} options.walletId - The ID of the wallet associated with the transaction.
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
-  async txPostData(options, headers, queryParams) {
+  async txPostData(options) {
 
 	try {
 
 	  await this.validate();
-
-	  await this.validator.txPostData(options);
 
 	  let url = '/tx/postdata';
 
 	  let requestHeaders = {
-		'Authorization': this.auth.getAuthToken()
+		'Authorization': this.auth.getAuthToken(),
+		'accept': 'application/json'
 	  };
 
-	  if (queryParams && queryParams.walletId) {
-		url += '?walletID=' + queryParams.walletId;
+	  if (options && options.walletId) {
+		url += '?walletID=' + options.walletId;
+		delete options.walletId
 	  };
 
 	  const response = await this.request.postRequest(url, options, requestHeaders);
@@ -150,51 +128,47 @@ class DataIntegrity {
 	}
   }
 
-  /**
-   * Function to Upload File on 1 Sat Ordinal Blockchain
-   *
-   * @param {formData} options.upfile - file to upload on blockchain.
-   * @param {string} headers.Authorization - The access token for authentication (Authorization header).
-   * @param {string} headers.ContentType - The content type of the request (Content-Type header).
-   *
-   * @param {string} queryParams.walletId - The ID of the wallet associated with the transaction.
-   *
-   * @throws {Error} Throws an error if the transaction request fails.
-   * @return {Object} The headers of the response if successful.
-   */
-  // Todo: test this endpoint
-  async txUpload(options, headers, queryParams) {
-
+/**
+ * Function to Upload File on 1 Sat Ordinal Blockchain
+ *
+ * @param {Object} options.upfile - File to upload on the blockchain.
+ * @param {string} options.walletId - The ID of the wallet associated with the transaction.
+ *
+ * @throws {Error} Throws an error if the transaction request fails.
+ * @return {Object} The headers of the response if successful.
+ */
+    async txUpload(options) {
 	try {
-
 	  await this.validate();
-
-	  await this.validator.txUpload(options);
-
-	  const url = '/tx/upload';
-
+  
+	  let url = '/tx/upload'; // Use let instead of const for reassignment
+  
 	  let requestHeaders = {
-		'Authorization': headers.Authorization,
-		'Content-Type': headers['Content-Type'],
+		'Authorization': this.auth.getAuthToken(),
+		'accept': 'application/json',
+		'Content-Type': 'multipart/form-data',
 	  };
-
-	  if (queryParams && queryParams.walletId) {
-		requestHeaders = {
-		  ...requestHeaders,
-		  walletId: queryParams.walletId,
-		};
+  
+	  const formData = options.upfile;
+  
+	  if (options && options.walletId) {
+		url += `?walletID=${options.walletId}`; // Append walletID to the URL
 	  }
-	  ;
 
-	  const response = await this.request.postRequest(url, options, requestHeaders);
+	  console.log(url, formData, requestHeaders)
+  
+	  const response = await this.request.postRequest(url, formData, requestHeaders);
+	  
 	  if (response instanceof Error) {
 		throw response;
 	  }
+  
 	  return response;
 	} catch (error) {
 	  throw new Error('Transaction request failed: ' + error);
 	}
   }
+  
 }
 
 export default DataIntegrity;

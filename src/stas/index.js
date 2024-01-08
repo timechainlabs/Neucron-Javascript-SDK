@@ -1,13 +1,9 @@
 import Request from '../request.js';
-import validator from './validator.js';
 
-class Asset {
-
-  // TODO: implement these endpoints {RegisterAsset, ConsolidatedEndpoint}
+class Stas {
 
   constructor(auth) {
 	this.auth = auth;
-	this.validator = validator;
 	this.request = new Request();
   }
 
@@ -20,14 +16,13 @@ class Asset {
   /**
    * Creates an asset on the Neucron platform.
    * @param {Object} options - The data for the asset creation.
-   * @param {string} [queryParams.walletId] - The data for the asset creation (Optional).
+   * @param {string} [options.walletId] - The data for the asset creation (Optional).
    * @throws {Error} Throws an error if the request fails.
    * @return {Object} The response data if successful.
    */
-  async createAsset( options,queryParams) {
+  async createAsset(options) {
 
 	await this.validate();
-	await this.validator.assetData(options);
 
 	try {
 	  let endpoint = '/asset/create';
@@ -36,8 +31,9 @@ class Asset {
 		Authorization: this.auth.getAuthToken()
 	  };
 
-	  if (queryParams && queryParams.walletId){
-		endpoint += '?walletID=' + queryParams.walletId;
+	  if (options && options.walletId){
+		endpoint += '?walletID=' + options.walletId;
+		delete options.walletId
 	  }
 
 	  const response = await this.request.postRequest(endpoint,options,requestHeaders);
@@ -78,29 +74,53 @@ class Asset {
 	}
   }
 
+   /**
+   * return list of assets
+   * @throws {Error} Throws an error if the transaction request fails.
+   * @param {string} [options.walletId] - Required.
+   * @return {Object} The headers of the response if successful.
+   */
+   async getAssetsByWalletId(walletId) {
+	try {
+	  await this.validate();
+
+	  const endpoint = '/asset/list';
+
+	  let requestHeaders = {
+		Authorization: this.auth.getAuthToken()
+	  };
+		
+	  endpoint += '?walletID=' + walletId;
+
+	  const response = await this.request.getRequest(endpoint, requestHeaders);
+
+	  if (response instanceof Error) {
+		throw response;
+	  }
+	  return response.data;
+	} catch (error) {
+	  throw new Error('Unable to fetch wallet Ids : ' + error);
+	}
+  }
+
   /**
    * return status of asset
-   * @param {string} options.tokenId tokenId of asset you want to fetch status of.
+   * @param {string} tokenId tokenId of asset you want to fetch status of.
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
-  async getAssetStatus(options) {
+  async getAssetStatus(tokenId) {
 	try {
 
 	  await this.validate();
-	  await this.validator.assetStatus(options);
 	  let endpoint = '/asset/status';
 
 	  let requestHeaders = {
 		Authorization: this.auth.getAuthToken()
 	  };
 
-	  if (options && options.tokenId){
-		endpoint += '?tokenID=' + options.tokenId;
-	  }
+	  endpoint += '?tokenID=' + tokenId;
 
-	  // eslint-disable-next-line no-console
-	  console.log(endpoint, requestHeaders);
 	  const response = await this.request.getRequest(endpoint, requestHeaders);
 
 	  if (response instanceof Error) {
@@ -114,27 +134,22 @@ class Asset {
 
   /**
    * get Tokens by address
-   * @param {string} options.address  address of wallet you want to fetch tokens of
+   * @param {string} address  address of wallet you want to fetch tokens of
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
-  async getTokensByAddress(options) {
+  async getTokensByAddress(address) {
 	try {
 
 	  await this.validate();
-	  await this.validator.getTokensByAddress(options);
 	  let endpoint = '/asset/tokens';
 
 	  let requestHeaders = {
 		Authorization: this.auth.getAuthToken()
 	  };
 
-	  if (options && options.address){
-		endpoint += '?address=' + options.address;
-	  }
+	  endpoint += '?address=' + address;
 
-	  // eslint-disable-next-line no-console
-	  console.log(endpoint, requestHeaders);
 	  const response = await this.request.getRequest(endpoint, requestHeaders);
 
 	  if (response instanceof Error) {
@@ -152,7 +167,7 @@ class Asset {
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
-  async getTokensByWalletId(options) {
+  async listTokens(options) {
 	try {
 
 	  await this.validate();
@@ -164,10 +179,41 @@ class Asset {
 
 	  if (options && options.walletId){
 		endpoint += '?walletID=' + options.walletId;
+		delete options.walletId
 	  }
 
-	  // eslint-disable-next-line no-console
-	  console.log(endpoint, requestHeaders);
+	  const response = await this.request.getRequest(endpoint, requestHeaders);
+
+	  if (response instanceof Error) {
+		throw response;
+	  }
+	  return response;
+	} catch (error) {
+	  throw new Error('Unable to process you request at this moment : ' + error);
+	}
+  }
+
+  /**
+   * get Tokens by walletId
+   * @param {string} [options.walletId]  walletId they belong to if no walletId is provided then it will default walletId
+   * @throws {Error} Throws an error if the transaction request fails.
+   * @return {Object} The headers of the response if successful.
+   */
+  async listTokensByConsolidating(options) {
+	try {
+
+	  await this.validate();
+	  let endpoint = '/asset/tokens/consolidated';
+
+	  let requestHeaders = {
+		Authorization: this.auth.getAuthToken()
+	  };
+
+	  if (options && options.walletId){
+		endpoint += '?walletID=' + options.walletId;
+		delete options.walletId
+	  }
+
 	  const response = await this.request.getRequest(endpoint, requestHeaders);
 
 	  if (response instanceof Error) {
@@ -182,16 +228,13 @@ class Asset {
   /**
    * Transfer Asset .
    * @param {Object} options - The data for the asset creation.
-   * @param {string} [queryParams.walletId] - The data for the asset creation (Optional).
+   * @param {string} [options.walletId] - The data for the asset creation (Optional).
    * @throws {Error} Throws an error if the request fails.
    * @return {Object} The response data if successful.
    */
-  async transferAsset( options,queryParams) {
+  async transferAsset(options) {
 
 	await this.validate();
-	await this.validator.transferAsset(options);
-
-	// TODO: test this endpoint
 
 	try {
 	  let endpoint = '/asset/transfer';
@@ -200,8 +243,9 @@ class Asset {
 		Authorization: this.auth.getAuthToken()
 	  };
 
-	  if (queryParams && queryParams.walletId){
-		endpoint += '?walletID=' + queryParams.walletId;
+	  if (options && options.walletId){
+		endpoint += '?walletID=' + options.walletId;
+		delete options.walletId
 	  }
 
 	  const response = await this.request.postRequest(endpoint,options,requestHeaders);
@@ -219,14 +263,13 @@ class Asset {
   /**
    * Transfer All Assets .
    * @param {Object} options - The data for the asset creation.
-   * @param {string} [queryParams.walletId] - The data for the asset creation (Optional).
+   * @param {string} [options.walletId] - The data for the asset creation (Optional).
    * @throws {Error} Throws an error if the request fails.
    * @return {Object} The response data if successful.
    */
-  async transferAllAssets( options,queryParams) {
-	// TODO: test this endpoint
+  async transferAllAssets(options) {
+	
 	await this.validate();
-	await this.validator.transferAllAssets(options);
 
 	try {
 	  let endpoint = '/asset/transfer/address';
@@ -235,8 +278,9 @@ class Asset {
 		Authorization: this.auth.getAuthToken()
 	  };
 
-	  if (queryParams && queryParams.walletId){
-		endpoint += '?walletID=' + queryParams.walletId;
+	  if (options && options.walletId){
+		endpoint += '?walletID=' + options.walletId;
+		delete options.walletId
 	  }
 
 	  const response = await this.request.postRequest(endpoint,options,requestHeaders);
@@ -252,4 +296,4 @@ class Asset {
   }
 }
 
-export default Asset;
+export default Stas;
