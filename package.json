@@ -1,7 +1,7 @@
 {
   "type": "module",
   "name": "@neucron/sdk",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "The official Neucron JavaScript SDK",
   "exports": {
     ".": "./dist/neucron-sdk.js",
