@@ -1,10 +1,8 @@
 import Request from '../request.js';
-import validator from './validator.js';
 
 class SmartContracts {
   constructor(auth) {
 	this.auth = auth;
-	this.validator = validator;
 	this.request = new Request();
   }
 
@@ -27,14 +25,13 @@ class SmartContracts {
    * a request to the designated API endpoint to create a transaction.
    * @param {string} options.script - custom script which you want to attach with your transaction.
    * @param {number} options.satoshi - amount of satoshi.
-   * @param {string} [queryParams.walletId] - The ID of the wallet associated with the transaction (optional).
+   * @param {string} [options.walletId] - The ID of the wallet associated with the transaction (optional).
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
-  async txAsm(options, queryParams) {
+  async txAsm(options) {
 	try {
 	  await this.validate();
-	  await this.validator.txAsm(options);
 
 	  let endpoint = '/tx/asm';
 
@@ -42,8 +39,9 @@ class SmartContracts {
 		Authorization: this.auth.getAuthToken(),
 	  };
 
-	  if (queryParams && queryParams.walletId) {
-		endpoint += '?walletID=' + queryParams.walletId;
+	  if (options && options.walletId) {
+		endpoint += '?walletID=' + options.walletId;
+		delete options.walletId
 	  }
 
 	  const requestBody = {
@@ -82,15 +80,14 @@ class SmartContracts {
    *                                        Example: "OP_2 OP_2 OP_ADD OP_EQUAL".
    * @param {string} options.changeAddress - The change address for the transaction.
    *
-   * @param {string} [queryParams.walletId] - The ID of the wallet associated with the transaction (optional).
+   * @param {string} [options.walletId] - The ID of the wallet associated with the transaction (optional).
    *
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
-  async txMultiple(options,queryParams) {
+  async txMultiple(options) {
 	try {
 	  await this.validate();
-	  await this.validator.txMultiple(options);
 
 	  let endpoint = '/tx/multiple';
 
@@ -98,8 +95,9 @@ class SmartContracts {
 		'Authorization': this.auth.getAuthToken()
 	  };
 
-	  if(queryParams && queryParams.walletId){
-		endpoint += '?walletID=' + queryParams.walletId;
+	  if(options && options.walletId){
+		endpoint += '?walletID=' + options.walletId;
+		delete options.walletId
 	  };
 
 	  const requestBody = {
@@ -141,16 +139,13 @@ class SmartContracts {
    *                                        Example: "OP_2 OP_2 OP_ADD OP_EQUAL".
    * @param {string} options.Change_Address - The change address for the transaction.
    *
-   * @param {string} queryParams.walletId - The ID of the wallet associated with the transaction.
-   *
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
-  async txSign(options, queryParams, headers) {
-	// TODO: Test This Endpoint [Workflow not tested - waiting[R&D]]
+  async txSign(options) {
+
 	try {
 	  await this.validate();
-	  await this.validator.txSign(options);
 
 	  const endpoint = '/tx/sign';
 
@@ -185,25 +180,25 @@ class SmartContracts {
    * @param {string} options.unlockingScript - unlocking script of prev transaction.
    * @param {number} options.outputIndex - output index of prev transaction which user want to unlock.
    * @param {string} options.prevTxID - previous transaction id which user want to unlock.
-   * @param {string} [queryParams.walletId] - The ID of the wallet associated with the transaction (Optional).
+   * @param {string} [options.walletId] - The ID of the wallet associated with the transaction (Optional).
    *
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
-  async txUnlock(options, queryParams) {
-	// TODO: Test This Endpoint
+  async txUnlock(options) {
+
 	try {
 
 	  await this.validate();
-	  await this.validator.txUnlock(options);
 	  let endpoint = '/tx/unlock';
 
 	  let requestHeaders = {
 		Authorization: this.auth.getAuthToken()
 	  };
 
-	  if (queryParams && queryParams.walletId) {
-		endpoint += '?walletID=' + queryParams.walletId;
+	  if (options && options.walletId) {
+		endpoint += '?walletID=' + options.walletId;
+		delete options.walletId
 	  }
 
 	  const requestBody = {
@@ -212,8 +207,6 @@ class SmartContracts {
 		prevTxID: options.prevTxID
 	  };
 
-	  // eslint-disable-next-line no-console
-	  console.log(endpoint, requestBody, requestHeaders);
 	  const response = await this.request.postRequest(endpoint, requestBody, requestHeaders);
 
 	  if (response instanceof Error) {
