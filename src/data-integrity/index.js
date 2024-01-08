@@ -79,6 +79,7 @@ class DataIntegrity {
 
 	  if (options && options.walletId) {
 		url = url + '?walletID=' + options.walletId
+		delete options.walletId
 	  };
 
 	  const response = await this.request.postRequest(url, options, requestHeaders);
@@ -114,6 +115,7 @@ class DataIntegrity {
 
 	  if (options && options.walletId) {
 		url += '?walletID=' + options.walletId;
+		delete options.walletId
 	  };
 
 	  const response = await this.request.postRequest(url, options, requestHeaders);
@@ -135,7 +137,7 @@ class DataIntegrity {
  * @throws {Error} Throws an error if the transaction request fails.
  * @return {Object} The headers of the response if successful.
  */
-async txUpload(options) {
+    async txUpload(options) {
 	try {
 	  await this.validate();
   
