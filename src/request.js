@@ -14,7 +14,7 @@ class Request {
 		url += `${reqPath}`;
 		const response = await axios.post(url, data, {
 			headers: {
-				...headers, ...this.globalHeaders
+				 ...this.globalHeaders, ...headers
 			},
 		});
 		if (response.status < 400) {
