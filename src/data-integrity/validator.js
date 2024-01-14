@@ -2,12 +2,15 @@ import Joi from 'joi';
 
 class Validator {
 
-	async txFile(opts) {
+	async uploadFile(options) {
 		const schema = Joi.object({
-			upfile : Joi.any().required(),
+		  filePath: Joi.string().required(),
+		  walletId: Joi.string(),
+		  data: Joi.string(),
 		});
-		await schema.validateAsync(opts);
-	}
+	
+		await schema.validateAsync(options);
+	  }
 
 	async txMeSign(opts) {
 		const schema = Joi.object({

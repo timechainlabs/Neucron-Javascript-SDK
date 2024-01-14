@@ -1,6 +1,6 @@
 {
   "type": "module",
-  "name": "@neucron/sdk",
+  "name": "neucron-sdk",
   "version": "0.2.0",
   "description": "The official Neucron JavaScript SDK",
   "exports": {
@@ -27,7 +27,10 @@
   "homepage": "https://github.com/timechainlabs/Neucron-Javascript-SDK.git#readme",
   "dependencies": {
     "axios": "^0.22.0",
-    "joi": "^17.4.2"
+    "form-data": "^4.0.0",
+    "fs": "^0.0.1-security",
+    "joi": "^17.4.2",
+    "path": "^0.12.7"
   },
   "devDependencies": {
     "@babel/cli": "^7.17.0",

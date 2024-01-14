@@ -31,8 +31,11 @@ class Stas {
 		Authorization: this.auth.getAuthToken()
 	  };
 
+	   endpoint += '?assetName=' + options.assetName;
+	   delete options.assetName
+
 	  if (options && options.walletId){
-		endpoint += '?walletID=' + options.walletId;
+		endpoint += '&walletID=' + options.walletId;
 		delete options.walletId
 	  }
 
@@ -84,7 +87,7 @@ class Stas {
 	try {
 	  await this.validate();
 
-	  const endpoint = '/asset/list';
+	  let endpoint = '/asset/list';
 
 	  let requestHeaders = {
 		Authorization: this.auth.getAuthToken()

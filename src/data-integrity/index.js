@@ -1,29 +1,32 @@
+
 import Request from '../request.js';
+import FormData from 'form-data'
+import Helper from './helper.js'
 
 class DataIntegrity {
     constructor(auth) {
 		this.auth = auth;
 		this.request = new Request();
-	  }
+	}
 	
-	  async validate() {
+	async validate() {
 		if (!this.auth.getAuthToken()) {
 		  throw new Error('You must logged In. Try calling auth() method first');
 		}
 	  }
 
 
-  /**
+/**
    * Function to Upload File on Blockchain [Bitcom]
    *
-   * @param {formData} options.upfile - file to upload on blockchain.
+   * @param {string} options.filePath - file path to upload on blockchain.
    * @param {string} options.walletId - The ID of the wallet associated with the transaction.
+   * @param {string} options.data - The data you want to associate with this Tx
    *
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
-  async txFile(options) {
-
+  async uploadFile(options) {
 	try {
 
 	  await this.validate();
@@ -32,20 +35,16 @@ class DataIntegrity {
 
 	  let requestHeaders = {
 		'Authorization': this.auth.getAuthToken(),
-		'accept': 'application/json',
 		'Content-Type': 'multipart/form-data',
 	  };
 
-	  const formData = options.upfile;
-
-
-	  if (options && options.walletId) {
-		url = url + '?walletID=' + options.walletId
-	  };
-
-	  console.log(url, options, requestHeaders);
-
-	  const response = await this.request.postRequest(url, options, requestHeaders);
+	  const formData = new FormData();
+	  Helper.fileUploadMiddleware(formData,options.filePath);
+	  requestHeaders = {...requestHeaders, ...formData.getHeaders()}
+	  if(options.data){
+		formData.append('data',options.data)
+	  }
+	  const response = await this.request.postRequest(Helper.addParamsInURL(url,options), formData, requestHeaders);
 	  if (response instanceof Error) {
 		throw response;
 	  }
@@ -53,46 +52,9 @@ class DataIntegrity {
 	} catch (error) {
 	  throw new Error('Transaction request failed: ' + error);
 	}
-  }
+}
 
-  /**
-   * Function to sign message using one of your private key this will return signature and public key
-   *
-   * @param {string} options.message - message to be sign.
-   * @param {string} options.walletId - The ID of the wallet associated with the transaction.
-   *
-   * @throws {Error} Throws an error if the transaction request fails.
-   * @return {Object} The headers of the response if successful.
-   */
-  async txMessageSign(options) {
-
-	try {
-
-	  await this.validate();
-
-	  const url = '/tx/mesign';
-
-	  let requestHeaders = {
-		'Authorization': this.auth.getAuthToken(),
-		'accept': 'application/json'
-	  };
-
-	  if (options && options.walletId) {
-		url = url + '?walletID=' + options.walletId
-		delete options.walletId
-	  };
-
-	  const response = await this.request.postRequest(url, options, requestHeaders);
-	  if (response instanceof Error) {
-		throw response;
-	  }
-	  return response;
-	} catch (error) {
-	  throw new Error('Transaction request failed: ' + error);
-	}
-  }
-
-  /**
+/**
    * Function to post data on blockchain
    *
    * @param {string} options.message - message to post on blockchain.
@@ -100,7 +62,7 @@ class DataIntegrity {
    * @throws {Error} Throws an error if the transaction request fails.
    * @return {Object} The headers of the response if successful.
    */
-  async txPostData(options) {
+  async postData(options) {
 
 	try {
 
@@ -113,12 +75,7 @@ class DataIntegrity {
 		'accept': 'application/json'
 	  };
 
-	  if (options && options.walletId) {
-		url += '?walletID=' + options.walletId;
-		delete options.walletId
-	  };
-
-	  const response = await this.request.postRequest(url, options, requestHeaders);
+	  const response = await this.request.postRequest(Helper.addParamsInURL(url,options), options, requestHeaders);
 	  if (response instanceof Error) {
 		throw response;
 	  }
@@ -126,48 +83,112 @@ class DataIntegrity {
 	} catch (error) {
 	  throw new Error('Transaction request failed: ' + error);
 	}
-  }
+}
 
 /**
- * Function to Upload File on 1 Sat Ordinal Blockchain
- *
- * @param {Object} options.upfile - File to upload on the blockchain.
- * @param {string} options.walletId - The ID of the wallet associated with the transaction.
- *
- * @throws {Error} Throws an error if the transaction request fails.
- * @return {Object} The headers of the response if successful.
- */
-    async txUpload(options) {
+   * Function to Upload File on Blockchain [Bitcom]
+   *
+   * @param {string} options.filePath - file path to upload on blockchain.
+   * @param {string} options.walletId - The ID of the wallet associated with the transaction.
+   * @param {string} options.publicKey - public key you want to associate with this Tx
+   *
+   * @throws {Error} Throws an error if the transaction request fails.
+   * @return {Object} The headers of the response if successful.
+   */
+  async uploadEncryptFile(options) {
+		try {
+	
+		  await this.validate();
+	
+		  let url = '/tx/encrypt';
+	
+		  let requestHeaders = {
+			'Authorization': this.auth.getAuthToken(),
+			'Content-Type': 'multipart/form-data',
+		  };
+	
+		  const formData = new FormData();
+		  Helper.fileUploadMiddleware(formData,options.filePath);
+		  requestHeaders = {...requestHeaders, ...formData.getHeaders()}
+		  formData.append('publickey',options.publicKey)
+		  const response = await this.request.postRequest(Helper.addParamsInURL(url,options), formData, requestHeaders);
+		  if (response instanceof Error) {
+			throw response;
+		  }
+		  return response;
+		} catch (error) {
+		  throw new Error('Transaction request failed: ' + error);
+		}
+}
+
+
+/**
+   *Function to Upload File on 1 Sat Ordinal Blockchain
+   *
+   * @param {string} options.filePath - file path to upload on blockchain.
+   * @param {string} options.walletId - The ID of the wallet associated with the transaction.
+   *
+   * @throws {Error} Throws an error if the transaction request fails.
+   * @return {Object} The headers of the response if successful.
+   */
+  async uploadFileOnOrdinal(options) {
 	try {
+
 	  await this.validate();
-  
-	  let url = '/tx/upload'; // Use let instead of const for reassignment
-  
+
+	  let url = '/tx/upload';
+
 	  let requestHeaders = {
 		'Authorization': this.auth.getAuthToken(),
-		'accept': 'application/json',
 		'Content-Type': 'multipart/form-data',
 	  };
-  
-	  const formData = options.upfile;
-  
-	  if (options && options.walletId) {
-		url += `?walletID=${options.walletId}`; // Append walletID to the URL
-	  }
 
-	  console.log(url, formData, requestHeaders)
-  
-	  const response = await this.request.postRequest(url, formData, requestHeaders);
-	  
+	  const formData = new FormData();
+	  Helper.fileUploadMiddleware(formData,options.filePath);
+	  requestHeaders = {...requestHeaders, ...formData.getHeaders()}
+	  const response = await this.request.postRequest(Helper.addParamsInURL(url,options), formData, requestHeaders);
 	  if (response instanceof Error) {
 		throw response;
 	  }
-  
 	  return response;
 	} catch (error) {
 	  throw new Error('Transaction request failed: ' + error);
 	}
-  }
+}
+
+/**
+   *Function to Hash Tx
+   *
+   * @param {string} options.filePath - file path to upload on blockchain.
+   * @param {string} options.walletId - The ID of the wallet associated with the transaction.
+   *
+   * @throws {Error} Throws an error if the transaction request fails.
+   * @return {Object} The headers of the response if successful.
+   */
+  async uploadHashedFile(options) {
+	try {
+
+	  await this.validate();
+
+	  let url = '/tx/hash';
+
+	  let requestHeaders = {
+		'Authorization': this.auth.getAuthToken(),
+		'Content-Type': 'multipart/form-data',
+	  };
+
+	  const formData = new FormData();
+	  Helper.fileUploadMiddleware(formData,options.filePath);
+	  requestHeaders = {...requestHeaders, ...formData.getHeaders()}
+	  const response = await this.request.postRequest(Helper.addParamsInURL(url,options), formData, requestHeaders);
+	  if (response instanceof Error) {
+		throw response;
+	  }
+	  return response;
+	} catch (error) {
+	  throw new Error('Transaction request failed: ' + error);
+	}
+}
   
 }
 
