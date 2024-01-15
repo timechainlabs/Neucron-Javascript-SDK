@@ -24,4 +24,4 @@ class Validator {
 }
 
 
-export default Validator;
+export default new Validator();

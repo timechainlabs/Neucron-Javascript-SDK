@@ -26,8 +26,7 @@ class Wallet {
  */
 async createWallet(options) {
     try {
-
-		this.validate.createWallet(options);
+		await this.validator.createWallet(options);
         await this.validate();
 
         const endpoint = '/wallet/create';
@@ -64,7 +63,7 @@ async createWallet(options) {
   async setDefaultWallet(options) {
 
 	try {
-	  this.validate.setDefaultWallet(options);
+		await this.validator.setDefaultWallet(options);
 	  await this.validate();
 
 	  const endpoint = '/wallet/default';
