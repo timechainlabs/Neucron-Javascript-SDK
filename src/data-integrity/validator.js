@@ -12,23 +12,36 @@ class Validator {
 		await schema.validateAsync(options);
 	  }
 
-	async txMeSign(opts) {
+	async postData(opts) {
 		const schema = Joi.object({
 			message: Joi.string().required(),
+			walletId: Joi.string(),
 		});
 		await schema.validateAsync(opts);
 	}
 
-	async txPostData(opts) {
+	async uploadEncryptFile(options) {
 		const schema = Joi.object({
-			message: Joi.string().required(),
+		  filePath: Joi.string().required(),
+		  walletId: Joi.string(),
+		  publicKey: Joi.string().required(),
+		});
+	
+		await schema.validateAsync(options);
+	  }
+
+	async uploadFileOnOrdinal(opts) {
+		const schema = Joi.object({
+			filePath: Joi.string().required(),
+		    walletId: Joi.string(),
 		});
 		await schema.validateAsync(opts);
 	}
 
-	async txUpload(opts) {
+	async uploadHashedFile(opts) {
 		const schema = Joi.object({
-			upfile: Joi.any(),
+			filePath: Joi.string().required(),
+		    walletId: Joi.string(),
 		});
 		await schema.validateAsync(opts);
 	}

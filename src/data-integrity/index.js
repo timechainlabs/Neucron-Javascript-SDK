@@ -2,10 +2,12 @@
 import Request from '../request.js';
 import FormData from 'form-data'
 import Helper from './helper.js'
+import validator from './validator.js';
 
 class DataIntegrity {
     constructor(auth) {
 		this.auth = auth;
+		this.validator = validator;
 		this.request = new Request();
 	}
 	
@@ -29,6 +31,7 @@ class DataIntegrity {
   async uploadFile(options) {
 	try {
 
+	  await this.validator.uploadFile(options);
 	  await this.validate();
 
 	  let url = '/tx/file';
@@ -66,6 +69,7 @@ class DataIntegrity {
 
 	try {
 
+	  await this.validator.postData(options);
 	  await this.validate();
 
 	  let url = '/tx/postdata';
@@ -89,7 +93,7 @@ class DataIntegrity {
    * Function to Upload File on Blockchain [Bitcom]
    *
    * @param {string} options.filePath - file path to upload on blockchain.
-   * @param {string} options.walletId - The ID of the wallet associated with the transaction.
+   * @param {string} [options.walletId] - The ID of the wallet associated with the transaction.
    * @param {string} options.publicKey - public key you want to associate with this Tx
    *
    * @throws {Error} Throws an error if the transaction request fails.
@@ -97,7 +101,8 @@ class DataIntegrity {
    */
   async uploadEncryptFile(options) {
 		try {
-	
+
+		  await this.validator.uploadEncryptFile(options);
 		  await this.validate();
 	
 		  let url = '/tx/encrypt';
@@ -133,7 +138,7 @@ class DataIntegrity {
    */
   async uploadFileOnOrdinal(options) {
 	try {
-
+	  await	this.validator.uploadFileOnOrdinal(options)
 	  await this.validate();
 
 	  let url = '/tx/upload';
@@ -167,9 +172,9 @@ class DataIntegrity {
    */
   async uploadHashedFile(options) {
 	try {
-
+	
+	  await this.validator.uploadHashedFile(options)
 	  await this.validate();
-
 	  let url = '/tx/hash';
 
 	  let requestHeaders = {
