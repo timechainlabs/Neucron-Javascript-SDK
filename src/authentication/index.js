@@ -168,20 +168,17 @@ class Authentication {
   async verifyPhoneNo(options) {
 	await this.validator.verifyPhoneNo(options);
 
-	const url = '/auth/phone';
+	const url = '/auth/phone/verify';
 
-	const headers = {
-	  phone: options.phone,
-	  otp: options.otp,
-	};
+	const query = `?phone=${options.phone}&otp=${options.otp}`;
 
-	const resp = await this.request.postRequest(url, {}, headers);
+	const resp = await this.request.postRequest(url+ query, {}, {'accept': 'application/json'});
 
 	if (resp instanceof Error) {
 
 	  throw resp;
 	}
-	return resp.headers;
+	return resp;
   }
 }
 
